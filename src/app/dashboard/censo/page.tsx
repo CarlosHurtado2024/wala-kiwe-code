@@ -176,7 +176,7 @@ export default function CensoPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
                     {/* List View (Table) */}
-                    <div className="lg:col-span-8 flex flex-col gap-6">
+                    <div className="lg:col-span-12 flex flex-col gap-6">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <h3 className="text-xl font-bold text-white drop-shadow-md">Nómina de Comuneros</h3>
@@ -195,7 +195,11 @@ export default function CensoPage() {
                                 <thead>
                                     <tr className="border-b border-white/5 bg-white/5">
                                         <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">Comunero</th>
-                                        <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">Rol / Cargo</th>
+                                        <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">Documento</th>
+                                        <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30 text-center">Género</th>
+                                        <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30 text-center">Edad</th>
+                                        <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">Ubicación</th>
+                                        <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">Ocupación / Rol</th>
                                         <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">Estado</th>
                                         <th className="px-6 py-5 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30 text-right">Acciones</th>
                                     </tr>
@@ -217,8 +221,7 @@ export default function CensoPage() {
                                         filteredComuneros.map((person) => (
                                             <tr
                                                 key={person.id}
-                                                onClick={() => setSelectedComunero(person)}
-                                                className={`hover:bg-white/5 transition-all group cursor-pointer ${selectedComunero?.id === person.id ? 'bg-white/10' : ''}`}
+                                                className="hover:bg-white/5 transition-all group cursor-pointer"
                                             >
                                                 <td className="px-6 py-5">
                                                     <div className="flex items-center gap-4">
@@ -226,14 +229,28 @@ export default function CensoPage() {
                                                             <User className="w-5 h-5 text-primary-300" />
                                                         </div>
                                                         <div>
-                                                            <p className="font-bold text-sm text-white group-hover:text-primary-200 transition-colors">
+                                                            <p className="font-bold text-sm text-white group-hover:text-primary-200 transition-colors line-clamp-1">
                                                                 {person.nombres} {person.apellidos}
                                                             </p>
-                                                            <div className="flex items-center gap-2 text-[11px] text-white/40 mt-1">
-                                                                <MapPin className="w-3 h-3" />
-                                                                <span>{person.direccion_actual || 'Sin ubicación'} • {person.fecha_nacimiento ? `${new Date().getFullYear() - new Date(person.fecha_nacimiento).getFullYear()} años` : 'N/A'}</span>
-                                                            </div>
                                                         </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-5 text-xs font-bold text-white/70">
+                                                    <span className="text-[10px] text-white/30 mr-1.5">{person.tipo_documento}</span>
+                                                    {person.numero_documento}
+                                                </td>
+                                                <td className="px-6 py-5 text-center">
+                                                    <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-lg ${person.genero === 'M' ? 'bg-blue-500/10 text-blue-400' : person.genero === 'F' ? 'bg-pink-500/10 text-pink-400' : 'bg-white/5 text-white/40'}`}>
+                                                        {person.genero || '-'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-5 text-center text-xs font-bold text-white/80">
+                                                    {person.fecha_nacimiento ? `${new Date().getFullYear() - new Date(person.fecha_nacimiento).getFullYear()}` : '-'}
+                                                </td>
+                                                <td className="px-6 py-5 text-xs text-white/60">
+                                                    <div className="flex items-center gap-2 max-w-[150px]">
+                                                        <MapPin className="w-3 h-3 shrink-0" />
+                                                        <span className="truncate">{person.direccion_actual || 'No registrada'}</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-5">
@@ -283,116 +300,6 @@ export default function CensoPage() {
                         </div>
                     </div>
 
-                    {/* Right Detail Panel (Ficha Familiar) */}
-                    <div className="lg:col-span-4 flex flex-col gap-8">
-                        <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
-                            {/* Decorative radial gradient */}
-                            <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-[80px]"></div>
-
-                            <div className="relative z-10">
-                                <div className="flex items-center gap-3 mb-8">
-                                    <div className="bg-primary/20 p-2 rounded-xl">
-                                        <GitBranch className="w-5 h-5 text-primary-300" />
-                                    </div>
-                                    <h3 className="text-lg font-bold text-white tracking-tight">Ficha Familiar</h3>
-                                </div>
-
-                                {selectedComunero ? (
-                                    <>
-                                        <div className="flex flex-col items-center mb-10 group">
-                                            <div className="w-32 h-32 rounded-full p-1.5 border-2 border-dashed border-primary/50 mb-4 group-hover:rotate-6 transition-transform duration-500 bg-white/5 flex items-center justify-center">
-                                                <div className="w-full h-full rounded-full border-4 border-primary shadow-2xl overflow-hidden">
-                                                    {selectedComunero.foto_url ? (
-                                                        <img
-                                                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')}/storage/v1/object/public/censo/${selectedComunero.foto_url}`}
-                                                            alt={selectedComunero.nombres}
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        <User className="w-16 h-16 text-white/10" />
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <h4 className="text-2xl font-black text-white text-center">
-                                                {selectedComunero.primer_nombre} {selectedComunero.primer_apellido}
-                                            </h4>
-                                            <p className="text-[10px] text-primary-300 font-black uppercase tracking-[0.3em] mt-2 bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20 shadow-inner">
-                                                {selectedComunero.cargo_autoridad || 'Comunero'}
-                                            </p>
-                                        </div>
-
-                                        <div className="space-y-6">
-                                            <div className="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner">
-                                                <p className="text-[10px] text-white/30 uppercase font-black mb-4 tracking-[0.2em] flex items-center gap-2">
-                                                    <HeartPulse className="w-3 h-3" /> Información Básica
-                                                </p>
-                                                <div className="space-y-3">
-                                                    <div className="flex justify-between text-xs font-bold">
-                                                        <span className="text-white/40 uppercase">Documento</span>
-                                                        <span className="text-white">{selectedComunero.tipo_documento} {selectedComunero.numero_documento}</span>
-                                                    </div>
-                                                    <div className="flex justify-between text-xs font-bold">
-                                                        <span className="text-white/40 uppercase">Ocupación</span>
-                                                        <span className="text-white">{selectedComunero.ocupacion}</span>
-                                                    </div>
-                                                    <div className="flex justify-between text-xs font-bold">
-                                                        <span className="text-white/40 uppercase">Salud</span>
-                                                        <span className="text-white">{selectedComunero.regimen_salud}</span>
-                                                    </div>
-                                                    <div className="flex justify-between text-xs font-bold">
-                                                        <span className="text-white/40 uppercase">Nasayuwe</span>
-                                                        <span className="text-white">{selectedComunero.habla_nasayuwe}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="bg-white/5 p-4 rounded-3xl border border-white/5 shadow-inner text-center">
-                                                    <p className="text-[9px] text-white/30 uppercase font-black mb-1 tracking-widest">Escolaridad</p>
-                                                    <p className="text-[10px] text-white font-bold truncate">{selectedComunero.nivel_escolaridad}</p>
-                                                </div>
-                                                <div className="bg-white/5 p-4 rounded-3xl border border-white/5 shadow-inner text-center">
-                                                    <p className="text-[9px] text-white/30 uppercase font-black mb-1 tracking-widest">Estado Civil</p>
-                                                    <p className="text-[10px] text-white font-bold">{selectedComunero.estado_civil}</p>
-                                                </div>
-                                            </div>
-
-                                            <button className="w-full bg-primary text-white py-4 rounded-[1.5rem] text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-primary/80 transition-all mt-4 shadow-2xl shadow-primary/40 hover:scale-[1.02] active:scale-95 border border-primary/20">
-                                                <Award className="w-5 h-5" />
-                                                <span>Certificado Pertenencia</span>
-                                            </button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center h-full py-20 text-center">
-                                        <Users className="w-16 h-16 text-white/5 mb-4" />
-                                        <p className="text-white/20 text-xs font-bold uppercase tracking-widest">Selecciona un comunero para ver detalles</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Map Mini Preview */}
-                        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-6 h-64 overflow-hidden relative shadow-2xl group cursor-pointer">
-                            <div className="absolute inset-0 grayscale contrast-125 opacity-40 group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
-                                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAkHQ-XobgnHAULzTnyR_z7skjJ9J4_3HarVSuNRZxhMxH_enWtkuuSb1QIudn-JjMTCiJpBhtFBvV6fu4wpDo7XynwLr6BDhKOfhgstvHp_h9bn6orY9ulPHeXOoG738MQ4xtepjEXmgkqFS_99LQjpl7Sv_aN5DZK9URhtR7d-oH6HptBQsD5QpUktPhRWTEkG_B3BetLEhM9yiDsMfBPnEAgFjSBzHGwR9znr4mEUdeAkvEF8MG-iZQdmvvlvmibBfage-2-kZ0')", backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                            </div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent"></div>
-                            <div className="relative z-10 h-full flex flex-col justify-between">
-                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/60 drop-shadow-lg">Ubicación Geo-Referenciada</p>
-                                <div className="flex items-center gap-3 text-white">
-                                    <div className="relative">
-                                        <div className="absolute -inset-4 bg-primary/40 rounded-full animate-ping opacity-50"></div>
-                                        <MapPin className="w-10 h-10 text-primary drop-shadow-[0_0_15px_rgba(25,122,230,0.8)] relative z-10" />
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-lg drop-shadow-lg leading-none">Resguardo Wala Kiwe</p>
-                                        <p className="text-xs text-white/60 font-medium">Zona Norte del Cauca</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
