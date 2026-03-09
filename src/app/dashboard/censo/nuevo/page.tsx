@@ -42,6 +42,8 @@ export default function NuevoComuneroPage() {
         regimenSalud: "Subsidiado",
         eps: "",
         haSidoAutoridad: false,
+        esAutoridadActualmente: false,
+        cargoAutoridad: "",
         hablaNasayuwe: "Entiende pero no habla",
         discapacidades: [] as string[],
         tieneDiscapacidad: false,
@@ -301,6 +303,25 @@ export default function NuevoComuneroPage() {
                                     </div>
                                 </div>
                                 <input type="checkbox" checked={formData.haSidoAutoridad} onChange={e => setFormData({ ...formData, haSidoAutoridad: e.target.checked })} className="w-10 h-6 rounded-full bg-black/40 border-white/10 text-primary focus:ring-offset-0" />
+                            </div>
+
+                            <div className="mt-4 p-6 bg-primary/5 rounded-3xl border border-primary/10">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-3">
+                                        <ShieldCheck className="w-6 h-6 text-primary-300" />
+                                        <div className="flex flex-col">
+                                            <span className="text-white font-bold text-sm">¿Es autoridad actualmente?</span>
+                                        </div>
+                                    </div>
+                                    <input type="checkbox" checked={formData.esAutoridadActualmente} onChange={e => setFormData({ ...formData, esAutoridadActualmente: e.target.checked })} className="w-10 h-6 rounded-full bg-black/40 border-white/10 text-primary focus:ring-offset-0" />
+                                </div>
+                                {formData.esAutoridadActualmente && (
+                                    <div className="animate-in slide-in-from-top-2 duration-300">
+                                        <InputGroup label="Cargo Actual" required>
+                                            <input type="text" className="form-input" placeholder="Ej: Gobernador, Alguacil Mayor" value={formData.cargoAutoridad} onChange={e => setFormData({ ...formData, cargoAutoridad: e.target.value })} />
+                                        </InputGroup>
+                                    </div>
+                                )}
                             </div>
                         </section>
 
