@@ -9,6 +9,7 @@ import {
     Upload,
     Plus,
     Check,
+    ShieldCheck,
     AlertCircle,
     Calendar,
     IdCard,
