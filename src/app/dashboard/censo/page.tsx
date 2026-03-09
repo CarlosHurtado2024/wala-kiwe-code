@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Users,
     Search,
@@ -21,49 +21,62 @@ import {
     MapPin,
     CheckCircle2,
     XCircle,
-    Clock
+    Clock,
+    HeartPulse
 } from "lucide-react";
 import Image from 'next/image';
+import Link from 'next/link';
+import { getComuneros } from './fetch-actions';
 
 export default function CensoPage() {
     const [searchTerm, setSearchTerm] = useState("");
+    const [comuneros, setComuneros] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [selectedComunero, setSelectedComunero] = useState<any>(null);
+
+    useEffect(() => {
+        async function loadData() {
+            setLoading(true);
+            const data = await getComuneros();
+            setComuneros(data);
+            if (data.length > 0) {
+                setSelectedComunero(data[0]);
+            }
+            setLoading(false);
+        }
+        loadData();
+    }, []);
 
     const stats = [
-        { label: "Total Población", value: "1,252", trend: "+3% este año", icon: Users, color: "text-white" },
-        { label: "Niños & Jóvenes", value: "245", trend: "19.5% del total", icon: Baby, color: "text-blue-400" },
-        { label: "Adultos", value: "892", trend: "71.2% del total", icon: User, color: "text-emerald-400" },
-        { label: "Mayores (Sabedores)", value: "115", trend: "9.2% del total", icon: Sun, color: "text-amber-400" },
+        { label: "Total Población", value: comuneros.length.toString(), trend: "Registrados en BD", icon: Users, color: "text-white" },
+        {
+            label: "Niños & Jóvenes", value: comuneros.filter(c => {
+                if (!c.fecha_nacimiento) return false;
+                const age = new Date().getFullYear() - new Date(c.fecha_nacimiento).getFullYear();
+                return age < 18;
+            }).length.toString(), trend: "Menores de 18", icon: Baby, color: "text-blue-400"
+        },
+        {
+            label: "Adultos", value: comuneros.filter(c => {
+                if (!c.fecha_nacimiento) return false;
+                const age = new Date().getFullYear() - new Date(c.fecha_nacimiento).getFullYear();
+                return age >= 18 && age < 60;
+            }).length.toString(), trend: "Entre 18 y 60", icon: User, color: "text-emerald-400"
+        },
+        {
+            label: "Mayores (Sabedores)", value: comuneros.filter(c => {
+                if (!c.fecha_nacimiento) return false;
+                const age = new Date().getFullYear() - new Date(c.fecha_nacimiento).getFullYear();
+                return age >= 60;
+            }).length.toString(), trend: "Mayores de 60", icon: Sun, color: "text-amber-400"
+        },
     ];
 
-    const comuneros = [
-        {
-            id: 1,
-            name: "Feliciano Valencia",
-            location: "Vereda El Centro",
-            age: 54,
-            role: "Taita / Mayor",
-            status: "Vigente",
-            image: "https://lh3.googleusercontent.com/aida-public/AB6AXuD_-aeJ5ExOvaXbd5cjwADQgQ5v4WFGyzijyZNNhKs3SUbeb0MftYPI24dnH9lBc0Vszya1iqiVM0skW3nPr2_T60lZEZoauuN-hAnoosysnr22AmNdvwFO8gUlzc7ov0N8HeXUNMGvRR__USFtjino6N7IpGObb51rfEmB1NyYIMAGDzDV7LvlaTDK-iy-k1WwAOyXFFalatsEWGloTzn4sdHb39Sk-h7MvsOomzYCH82C0y_6F4kS6zxmQY_Dt58l7EcW0C-bGb4"
-        },
-        {
-            id: 2,
-            name: "Rosa Elvira Guejia",
-            location: "Vereda La Montaña",
-            age: 28,
-            role: "Guardia Indígena",
-            status: "Vigente",
-            image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCwzp6dzUUz6ZZI54kW-IkKCddjYi2uORxo3-vGutZ76N1AUs9lHY5o_NdPnppf8rB2V6N8e0FabKiTCual59-VwgXg39AoJ8DNV4qZNCVdb5-hVN5ed12_Rbxi8-hc483fW3vgxweyYCBzvquGvskVgQV3NhiwG779hsG87eY7mKFtEJF0f_UheK5LT7WSXWUeTgrSz4SqBTL0UOwukR7_9kRa7cL8ZMFL7ma-2D9bmdAomRqA_QmKevTyIyX0hvbfwU1BKkKU1PM"
-        },
-        {
-            id: 3,
-            name: "Juan Carlos Vitonás",
-            location: "Vereda El Río",
-            age: 42,
-            role: "Comunero",
-            status: "Inactivo",
-            image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCSHulMI1_oMCqK-OGpyAN0FQuisf5HlYgxT-uxWgEKSTiCYMkBRdIGvBkrpFjQoECYQ670sb3GFMNDPuor-Araqjo_9JYjD8FD5u3SJ0zaN0sSPwrwokfrFXbZB9q-bd0_7xEvfknGRaxtl39mPM0CdG2jfXWoe7F3tu3nK1X7RzLvM5ILAUWQu80jDePxJXqO5esp_kxFChtJoBmNecpbDzl9JQrxxLgaYRC1VmWtz08aB7_KSagACfyynM5LQAflFEG7mUv-3nQ"
-        },
-    ];
+    const filteredComuneros = comuneros.filter(c =>
+        (c.nombres?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+        (c.apellidos?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+        (c.numero_documento?.toLowerCase() || "").includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className="flex-1 flex flex-col min-h-0 bg-transparent">
@@ -90,10 +103,10 @@ export default function CensoPage() {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <button className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95">
+                    <Link href="/dashboard/censo/nuevo" className="bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95">
                         <UserPlus className="w-4 h-4" />
                         <span>Nuevo Comunero</span>
-                    </button>
+                    </Link>
                     <button className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 transition-colors">
                         <Bell className="w-5 h-5" />
                     </button>
@@ -188,61 +201,76 @@ export default function CensoPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-white/5">
-                                    {comuneros.map((person) => (
-                                        <tr key={person.id} className="hover:bg-white/5 transition-all group cursor-pointer">
-                                            <td className="px-6 py-5">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-xl border-2 border-white/10 group-hover:border-primary/40 transition-colors">
-                                                        <Image
-                                                            src={person.image}
-                                                            alt={person.name}
-                                                            width={48}
-                                                            height={48}
-                                                            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                                                            unoptimized
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-bold text-sm text-white group-hover:text-primary-200 transition-colors">{person.name}</p>
-                                                        <div className="flex items-center gap-2 text-[11px] text-white/40 mt-1">
-                                                            <MapPin className="w-3 h-3" />
-                                                            <span>{person.location} • {person.age} años</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-5">
-                                                <span className="text-[10px] px-3 py-1.5 rounded-xl bg-white/5 text-white/60 font-black uppercase border border-white/10 tracking-widest group-hover:border-primary/30 transition-colors">
-                                                    {person.role}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-5">
-                                                <div className="flex items-center gap-2">
-                                                    {person.status === "Vigente" ? (
-                                                        <>
-                                                            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
-                                                            <span className="text-[10px] font-black uppercase text-emerald-400 tracking-widest">Activo</span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <div className="w-2 h-2 rounded-full bg-white/20 shadow-inner"></div>
-                                                            <span className="text-[10px] font-black uppercase text-white/30 tracking-widest">Inactivo</span>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-5">
-                                                <div className="flex justify-end gap-2">
-                                                    <button className="p-2 rounded-xl bg-primary/10 text-primary-300 border border-primary/20 hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/5" title="Certificado">
-                                                        <Award className="w-4 h-4" />
-                                                    </button>
-                                                    <button className="p-2 rounded-xl bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 hover:text-white transition-all shadow-lg" title="Editar">
-                                                        <Edit className="w-4 h-4" />
-                                                    </button>
-                                                </div>
+                                    {loading ? (
+                                        <tr>
+                                            <td colSpan={4} className="px-6 py-10 text-center text-white/40 font-bold uppercase tracking-widest text-xs">
+                                                Cargando comuneros...
                                             </td>
                                         </tr>
-                                    ))}
+                                    ) : filteredComuneros.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={4} className="px-6 py-10 text-center text-white/40 font-bold uppercase tracking-widest text-xs">
+                                                No se encontraron registros
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredComuneros.map((person) => (
+                                            <tr
+                                                key={person.id}
+                                                onClick={() => setSelectedComunero(person)}
+                                                className={`hover:bg-white/5 transition-all group cursor-pointer ${selectedComunero?.id === person.id ? 'bg-white/10' : ''}`}
+                                            >
+                                                <td className="px-6 py-5">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-xl border-2 border-white/10 group-hover:border-primary/40 transition-colors bg-white/5 flex items-center justify-center">
+                                                            {person.foto_url ? (
+                                                                <Image
+                                                                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/censo/${person.foto_url}`}
+                                                                    alt={person.nombres}
+                                                                    width={48}
+                                                                    height={48}
+                                                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                                                                    unoptimized
+                                                                />
+                                                            ) : (
+                                                                <User className="w-6 h-6 text-white/20" />
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-bold text-sm text-white group-hover:text-primary-200 transition-colors">
+                                                                {person.nombres} {person.apellidos}
+                                                            </p>
+                                                            <div className="flex items-center gap-2 text-[11px] text-white/40 mt-1">
+                                                                <MapPin className="w-3 h-3" />
+                                                                <span>{person.direccion_actual || 'Sin ubicación'} • {person.fecha_nacimiento ? `${new Date().getFullYear() - new Date(person.fecha_nacimiento).getFullYear()} años` : 'N/A'}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-5">
+                                                    <span className="text-[10px] px-3 py-1.5 rounded-xl bg-white/5 text-white/60 font-black uppercase border border-white/10 tracking-widest group-hover:border-primary/30 transition-colors">
+                                                        {person.cargo_autoridad || person.ocupacion || 'Comunero'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-5">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                                                        <span className="text-[10px] font-black uppercase text-emerald-400 tracking-widest">Activo</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-5">
+                                                    <div className="flex justify-end gap-2">
+                                                        <button className="p-2 rounded-xl bg-primary/10 text-primary-300 border border-primary/20 hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/5" title="Certificado">
+                                                            <Award className="w-4 h-4" />
+                                                        </button>
+                                                        <button className="p-2 rounded-xl bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 hover:text-white transition-all shadow-lg" title="Editar">
+                                                            <Edit className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
                                 </tbody>
                             </table>
 
@@ -280,68 +308,81 @@ export default function CensoPage() {
                                     <h3 className="text-lg font-bold text-white tracking-tight">Ficha Familiar</h3>
                                 </div>
 
-                                <div className="flex flex-col items-center mb-10 group">
-                                    <div className="w-32 h-32 rounded-full p-1.5 border-2 border-dashed border-primary/50 mb-4 group-hover:rotate-6 transition-transform duration-500">
-                                        <div className="w-full h-full rounded-full border-4 border-primary shadow-2xl overflow-hidden">
-                                            <Image
-                                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_-aeJ5ExOvaXbd5cjwADQgQ5v4WFGyzijyZNNhKs3SUbeb0MftYPI24dnH9lBc0Vszya1iqiVM0skW3nPr2_T60lZEZoauuN-hAnoosysnr22AmNdvwFO8gUlzc7ov0N8HeXUNMGvRR__USFtjino6N7IpGObb51rfEmB1NyYIMAGDzDV7LvlaTDK-iy-k1WwAOyXFFalatsEWGloTzn4sdHb39Sk-h7MvsOomzYCH82C0y_6F4kS6zxmQY_Dt58l7EcW0C-bGb4"
-                                                alt="Selected Member"
-                                                width={128}
-                                                height={128}
-                                                className="w-full h-full object-cover"
-                                                unoptimized
-                                            />
-                                        </div>
-                                    </div>
-                                    <h4 className="text-2xl font-black text-white text-center">Feliciano Valencia</h4>
-                                    <p className="text-[10px] text-primary-300 font-black uppercase tracking-[0.3em] mt-2 bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20 shadow-inner">
-                                        Cabeza de Familia
-                                    </p>
-                                </div>
-
-                                <div className="space-y-6">
-                                    <div className="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner">
-                                        <p className="text-[10px] text-white/30 uppercase font-black mb-4 tracking-[0.2em] flex items-center gap-2">
-                                            <Users className="w-3 h-3" /> Núcleo Familiar
-                                        </p>
-                                        <div className="space-y-4">
-                                            {[
-                                                { name: "Maria Tunubalá", relation: "Esposa", icon: <User className="w-3 h-3" />, color: "text-emerald-400" },
-                                                { name: "José Valencia T.", relation: "Hijo (12 años)", icon: <Baby className="w-3 h-3" />, color: "text-blue-400" },
-                                                { name: "Yuli Valencia T.", relation: "Hija (8 años)", icon: <Baby className="w-3 h-3" />, color: "text-pink-400" },
-                                            ].map((rel, i) => (
-                                                <div key={i} className="flex items-center justify-between p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-transparent hover:border-white/10 cursor-pointer">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className={`w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center ${rel.color}`}>
-                                                            {rel.icon}
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-xs font-bold text-white">{rel.name}</p>
-                                                            <p className="text-[10px] text-white/40 font-medium">{rel.relation}</p>
-                                                        </div>
-                                                    </div>
-                                                    <CheckCircle2 className="w-3 h-3 text-emerald-500/50" />
+                                {selectedComunero ? (
+                                    <>
+                                        <div className="flex flex-col items-center mb-10 group">
+                                            <div className="w-32 h-32 rounded-full p-1.5 border-2 border-dashed border-primary/50 mb-4 group-hover:rotate-6 transition-transform duration-500 bg-white/5 flex items-center justify-center">
+                                                <div className="w-full h-full rounded-full border-4 border-primary shadow-2xl overflow-hidden">
+                                                    {selectedComunero.foto_url ? (
+                                                        <Image
+                                                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/censo/${selectedComunero.foto_url}`}
+                                                            alt={selectedComunero.nombres}
+                                                            width={128}
+                                                            height={128}
+                                                            className="w-full h-full object-cover"
+                                                            unoptimized
+                                                        />
+                                                    ) : (
+                                                        <User className="w-16 h-16 text-white/10" />
+                                                    )}
                                                 </div>
-                                            ))}
+                                            </div>
+                                            <h4 className="text-2xl font-black text-white text-center">
+                                                {selectedComunero.primer_nombre} {selectedComunero.primer_apellido}
+                                            </h4>
+                                            <p className="text-[10px] text-primary-300 font-black uppercase tracking-[0.3em] mt-2 bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20 shadow-inner">
+                                                {selectedComunero.cargo_autoridad || 'Comunero'}
+                                            </p>
                                         </div>
-                                    </div>
 
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-white/5 p-4 rounded-3xl border border-white/5 shadow-inner">
-                                            <p className="text-[9px] text-white/30 uppercase font-black mb-1">Código Ficha</p>
-                                            <p className="text-xs font-mono text-primary-200 font-bold">WK-44091</p>
-                                        </div>
-                                        <div className="bg-white/5 p-4 rounded-3xl border border-white/5 shadow-inner">
-                                            <p className="text-[9px] text-white/30 uppercase font-black mb-1">Localidad</p>
-                                            <p className="text-xs text-white/80 font-bold">Resguardo X</p>
-                                        </div>
-                                    </div>
+                                        <div className="space-y-6">
+                                            <div className="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner">
+                                                <p className="text-[10px] text-white/30 uppercase font-black mb-4 tracking-[0.2em] flex items-center gap-2">
+                                                    <HeartPulse className="w-3 h-3" /> Información Básica
+                                                </p>
+                                                <div className="space-y-3">
+                                                    <div className="flex justify-between text-xs font-bold">
+                                                        <span className="text-white/40 uppercase">Documento</span>
+                                                        <span className="text-white">{selectedComunero.tipo_documento} {selectedComunero.numero_documento}</span>
+                                                    </div>
+                                                    <div className="flex justify-between text-xs font-bold">
+                                                        <span className="text-white/40 uppercase">Ocupación</span>
+                                                        <span className="text-white">{selectedComunero.ocupacion}</span>
+                                                    </div>
+                                                    <div className="flex justify-between text-xs font-bold">
+                                                        <span className="text-white/40 uppercase">Salud</span>
+                                                        <span className="text-white">{selectedComunero.regimen_salud}</span>
+                                                    </div>
+                                                    <div className="flex justify-between text-xs font-bold">
+                                                        <span className="text-white/40 uppercase">Nasayuwe</span>
+                                                        <span className="text-white">{selectedComunero.habla_nasayuwe}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-                                    <button className="w-full bg-primary text-white py-4 rounded-[1.5rem] text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-primary/80 transition-all mt-4 shadow-2xl shadow-primary/40 hover:scale-[1.02] active:scale-95 border border-primary/20">
-                                        <Award className="w-5 h-5" />
-                                        <span>Certificado Pertenencia</span>
-                                    </button>
-                                </div>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="bg-white/5 p-4 rounded-3xl border border-white/5 shadow-inner text-center">
+                                                    <p className="text-[9px] text-white/30 uppercase font-black mb-1 tracking-widest">Escolaridad</p>
+                                                    <p className="text-[10px] text-white font-bold truncate">{selectedComunero.nivel_escolaridad}</p>
+                                                </div>
+                                                <div className="bg-white/5 p-4 rounded-3xl border border-white/5 shadow-inner text-center">
+                                                    <p className="text-[9px] text-white/30 uppercase font-black mb-1 tracking-widest">Estado Civil</p>
+                                                    <p className="text-[10px] text-white font-bold">{selectedComunero.estado_civil}</p>
+                                                </div>
+                                            </div>
+
+                                            <button className="w-full bg-primary text-white py-4 rounded-[1.5rem] text-sm font-black uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-primary/80 transition-all mt-4 shadow-2xl shadow-primary/40 hover:scale-[1.02] active:scale-95 border border-primary/20">
+                                                <Award className="w-5 h-5" />
+                                                <span>Certificado Pertenencia</span>
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="flex flex-col items-center justify-center h-full py-20 text-center">
+                                        <Users className="w-16 h-16 text-white/5 mb-4" />
+                                        <p className="text-white/20 text-xs font-bold uppercase tracking-widest">Selecciona un comunero para ver detalles</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
