@@ -6,22 +6,14 @@ import {
     Search,
     UserPlus,
     Bell,
-    TrendingUp,
-    Baby,
     User,
-    Sun,
     Filter,
-    MoreHorizontal,
     Download,
     Edit,
     Award,
     ChevronLeft,
     ChevronRight,
-    GitBranch,
     MapPin,
-    CheckCircle2,
-    XCircle,
-    Clock,
     HeartPulse
 } from "lucide-react";
 import Image from 'next/image';
@@ -47,30 +39,6 @@ export default function CensoPage() {
         loadData();
     }, []);
 
-    const stats = [
-        { label: "Total Población", value: comuneros.length.toString(), trend: "Registrados en BD", icon: Users, color: "text-white" },
-        {
-            label: "Niños & Jóvenes", value: comuneros.filter(c => {
-                if (!c.fecha_nacimiento) return false;
-                const age = new Date().getFullYear() - new Date(c.fecha_nacimiento).getFullYear();
-                return age < 18;
-            }).length.toString(), trend: "Menores de 18", icon: Baby, color: "text-blue-400"
-        },
-        {
-            label: "Adultos", value: comuneros.filter(c => {
-                if (!c.fecha_nacimiento) return false;
-                const age = new Date().getFullYear() - new Date(c.fecha_nacimiento).getFullYear();
-                return age >= 18 && age < 60;
-            }).length.toString(), trend: "Entre 18 y 60", icon: User, color: "text-emerald-400"
-        },
-        {
-            label: "Mayores (Sabedores)", value: comuneros.filter(c => {
-                if (!c.fecha_nacimiento) return false;
-                const age = new Date().getFullYear() - new Date(c.fecha_nacimiento).getFullYear();
-                return age >= 60;
-            }).length.toString(), trend: "Mayores de 60", icon: Sun, color: "text-amber-400"
-        },
-    ];
 
     const filteredComuneros = comuneros.filter(c =>
         (c.nombres?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
@@ -115,29 +83,6 @@ export default function CensoPage() {
 
             {/* Main Content Area */}
             <div className="flex-1 overflow-y-auto p-8 space-y-8 scroll-smooth custom-scrollbar">
-                {/* Top Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {stats.map((stat, i) => (
-                        <div key={i} className="group bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-[2rem] shadow-xl hover:bg-white/10 transition-all flex flex-col justify-between">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className={`p-3 rounded-2xl bg-white/5 border border-white/10 ${stat.color} shadow-inner`}>
-                                    <stat.icon className="w-6 h-6" />
-                                </div>
-                                {i === 0 && <TrendingUp className="w-4 h-4 text-emerald-400" />}
-                            </div>
-                            <div>
-                                <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">{stat.label}</p>
-                                <p className="text-3xl font-black text-white">{stat.value}</p>
-                                <div className="mt-4 flex items-center gap-2">
-                                    <div className="h-1 flex-1 bg-white/5 rounded-full overflow-hidden">
-                                        <div className="h-full bg-primary/40 w-2/3"></div>
-                                    </div>
-                                    <span className="text-[10px] font-bold text-white/60">{stat.trend}</span>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
 
                 {/* Filters Section (Glassmorphism) */}
                 <section className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[2rem] shadow-2xl relative overflow-hidden">
