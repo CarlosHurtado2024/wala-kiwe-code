@@ -9,7 +9,6 @@ import {
     Users,
     MoreVertical,
     ShieldCheck,
-    Agriculture,
     AlertTriangle,
     Map as MapIcon,
     CheckCircle2,
