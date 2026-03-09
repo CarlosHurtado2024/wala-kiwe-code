@@ -222,19 +222,8 @@ export default function CensoPage() {
                                             >
                                                 <td className="px-6 py-5">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-xl border-2 border-white/10 group-hover:border-primary/40 transition-colors bg-white/5 flex items-center justify-center">
-                                                            {person.foto_url ? (
-                                                                <Image
-                                                                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/censo/${person.foto_url}`}
-                                                                    alt={person.nombres}
-                                                                    width={48}
-                                                                    height={48}
-                                                                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                                                                    unoptimized
-                                                                />
-                                                            ) : (
-                                                                <User className="w-6 h-6 text-white/20" />
-                                                            )}
+                                                        <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+                                                            <User className="w-5 h-5 text-primary-300" />
                                                         </div>
                                                         <div>
                                                             <p className="font-bold text-sm text-white group-hover:text-primary-200 transition-colors">
@@ -314,13 +303,10 @@ export default function CensoPage() {
                                             <div className="w-32 h-32 rounded-full p-1.5 border-2 border-dashed border-primary/50 mb-4 group-hover:rotate-6 transition-transform duration-500 bg-white/5 flex items-center justify-center">
                                                 <div className="w-full h-full rounded-full border-4 border-primary shadow-2xl overflow-hidden">
                                                     {selectedComunero.foto_url ? (
-                                                        <Image
-                                                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/censo/${selectedComunero.foto_url}`}
+                                                        <img
+                                                            src={`${process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '')}/storage/v1/object/public/censo/${selectedComunero.foto_url}`}
                                                             alt={selectedComunero.nombres}
-                                                            width={128}
-                                                            height={128}
                                                             className="w-full h-full object-cover"
-                                                            unoptimized
                                                         />
                                                     ) : (
                                                         <User className="w-16 h-16 text-white/10" />
