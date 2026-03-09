@@ -32,7 +32,6 @@ export async function syncComunerosAI() {
             const embedding = await generateEmbedding(text);
 
             const { error: updateError } = await (supabase.from("comuneros") as any)
-                .from("comuneros")
                 .update({ embedding })
                 .eq("id", c.id);
 
