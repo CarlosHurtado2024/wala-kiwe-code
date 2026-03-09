@@ -24,7 +24,7 @@ export async function generateEmbedding(text: string) {
     return data.embedding.values;
 }
 
-export function prepareComuneroText(c: any) {
+export async function prepareComuneroText(c: any) {
     return `Comunero: ${c.primer_nombre} ${c.segundo_nombre || ''} ${c.primer_apellido} ${c.segundo_apellido}. 
     Documento: ${c.tipo_documento} ${c.numero_documento}.
     Ubicación: ${c.direccion_actual || 'No registrada'}.
