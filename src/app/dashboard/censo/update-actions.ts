@@ -2,13 +2,12 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { generateEmbedding, prepareComuneroText } from "@/utils/embeddings";
 
 export async function updateComunero(id: string, formData: FormData) {
     const supabase = await createClient();
 
-    // Pick only fields that are safe to update (don't break relational indices if they were linked, though currently familia_id is null)
-    // We exclude core IDs and sensitive system fields
-    const updates = {
+    const rawData = {
         primer_nombre: formData.get("primerNombre")?.toString(),
         segundo_nombre: formData.get("segundoNombre")?.toString(),
         primer_apellido: formData.get("primerApellido")?.toString(),
@@ -25,14 +24,19 @@ export async function updateComunero(id: string, formData: FormData) {
         estado_civil: formData.get("estadoCivil")?.toString(),
         tiene_discapacidad: formData.get("tieneDiscapacidad") === "true",
         discapacidades: JSON.parse(formData.get("discapacidades")?.toString() || "[]"),
-
-        // Legacy columns for compatibility
-        nombres: `${formData.get("primerNombre")} ${formData.get("segundoNombre") || ""}`.trim(),
-        apellidos: `${formData.get("primerApellido")} ${formData.get("segundoApellido")}`.trim(),
+        genero: formData.get("genero")?.toString(),
+        fecha_nacimiento: formData.get("fechaNacimiento")?.toString(),
     };
 
-    const { error } = await supabase
-        .from("comuneros")
+    const updates = {
+        ...rawData,
+        // Legacy columns for compatibility
+        nombres: `${rawData.primer_nombre} ${rawData.segundo_nombre || ""}`.trim(),
+        apellidos: `${rawData.primer_apellido} ${rawData.segundo_apellido}`.trim(),
+        embedding: await generateEmbedding(prepareComuneroText(rawData))
+    };
+
+    const { error } = await (supabase.from("comuneros") as any)
         .update(updates)
         .eq("id", id);
 

@@ -16,8 +16,9 @@ import {
     MapPin,
     HeartPulse
 } from "lucide-react";
-import { getComuneros } from './fetch-actions';
+import { getComuneros, searchComunerosAI } from './fetch-actions';
 import { updateComunero } from './update-actions';
+import { exportToExcel } from '@/utils/excel';
 import Link from 'next/link';
 import {
     X,
@@ -30,7 +31,11 @@ import {
     Languages,
     Briefcase,
     Type,
-    Check
+    Check,
+    Send,
+    Sparkles,
+    Loader2,
+    FileSpreadsheet
 } from "lucide-react";
 
 export default function CensoPage() {
@@ -42,6 +47,9 @@ export default function CensoPage() {
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [editData, setEditData] = useState<any>(null);
+    const [aiQuery, setAiQuery] = useState("");
+    const [isAiSearching, setIsAiSearching] = useState(false);
+    const [searchMode, setSearchMode] = useState<"standard" | "ai">("standard");
 
     useEffect(() => {
         loadData();
@@ -103,7 +111,30 @@ export default function CensoPage() {
             setIsSaving(false);
         }
     };
+    const handleAiSearch = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!aiQuery.trim()) {
+            setSearchMode("standard");
+            await loadData();
+            return;
+        }
 
+        setIsAiSearching(true);
+        setSearchMode("ai");
+        try {
+            const results = await searchComunerosAI(aiQuery);
+            setComuneros(results);
+        } catch (error) {
+            console.error(error);
+            alert("Error en la búsqueda con IA. Verifica la GEMINI_API_KEY.");
+        } finally {
+            setIsAiSearching(false);
+        }
+    };
+
+    const handleExport = () => {
+        exportToExcel(filteredComuneros, `Censo_Comunitario_${new Date().toISOString().split('T')[0]}.xlsx`);
+    };
 
     const filteredComuneros = comuneros.filter(c => {
         const searchStr = searchTerm.toLowerCase();
@@ -154,37 +185,60 @@ export default function CensoPage() {
             {/* Main Content Area */}
             <div className="flex-1 overflow-y-auto p-8 space-y-8 scroll-smooth custom-scrollbar">
 
-                {/* Filters Section (Glassmorphism) */}
-                <section className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[2rem] shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
-                    <div className="flex items-center gap-3 mb-6 relative z-10">
-                        <Filter className="w-5 h-5 text-primary-300" />
-                        <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-white/50">Filtros Avanzados</h3>
-                    </div>
+                {/* AI Chat Filters Section */}
+                <section className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-[2rem] shadow-2xl relative overflow-hidden transition-all hover:bg-white/[0.07]">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/5 rounded-full blur-[80px] -ml-24 -mb-24"></div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-                        {[
-                            { label: "Vereda / Localidad", options: ["Todas las Veredas", "El Centro", "La Montaña", "El Río"] },
-                            { label: "Rango de Edad", options: ["Cualquier edad", "0-12", "13-17", "18-60", "60+"] },
-                            { label: "Estado de Autoridad", options: ["Todos", "Autoridad Activa", "Ex-Autoridad", "Base"] },
-                        ].map((filter, i) => (
-                            <div key={i} className="flex flex-col gap-2">
-                                <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest ml-1">{filter.label}</label>
-                                <select className="bg-white/5 border border-white/10 rounded-xl py-2.5 px-4 text-sm focus:ring-2 focus:ring-primary/50 outline-none text-white/80 cursor-pointer hover:bg-white/10 transition-colors backdrop-blur-sm">
-                                    {filter.options.map(opt => <option key={opt} className="bg-slate-900 border-none">{opt}</option>)}
-                                </select>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                        <div className="space-y-1">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-primary/20 rounded-lg">
+                                    <Sparkles className="w-5 h-5 text-primary-300" />
+                                </div>
+                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white">Asistente de Búsqueda IA</h3>
                             </div>
-                        ))}
-
-                        <div className="flex flex-col gap-2">
-                            <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest ml-1">Género</label>
-                            <div className="flex gap-2 p-1 bg-white/5 rounded-xl border border-white/10 backdrop-blur-sm">
-                                <button className="flex-1 bg-primary/40 text-white rounded-lg py-1.5 text-[10px] font-black uppercase shadow-lg border border-primary/20">Todos</button>
-                                <button className="flex-1 text-white/40 rounded-lg py-1.5 text-[10px] font-black uppercase hover:bg-white/10 transition-all">H</button>
-                                <button className="flex-1 text-white/40 rounded-lg py-1.5 text-[10px] font-black uppercase hover:bg-white/10 transition-all">M</button>
-                            </div>
+                            <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest ml-1">Consulta en lenguaje natural sobre la comunidad</p>
                         </div>
+
+                        <form onSubmit={handleAiSearch} className="flex-1 max-w-2xl flex gap-3">
+                            <div className="relative flex-1 group">
+                                <input
+                                    type="text"
+                                    className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all group-hover:border-white/20"
+                                    placeholder="Ej: 'Mostrar comuneros que sean agricultores en El Centro' o '¿Quiénes son autoridades?'"
+                                    value={aiQuery}
+                                    onChange={(e) => setAiQuery(e.target.value)}
+                                />
+                                {isAiSearching && (
+                                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                                        <Loader2 className="w-5 h-5 text-primary-300 animate-spin" />
+                                    </div>
+                                )}
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={isAiSearching}
+                                className="bg-primary hover:bg-primary/90 text-white px-6 rounded-2xl transition-all shadow-xl shadow-primary/20 active:scale-95 disabled:opacity-50 flex items-center gap-2"
+                            >
+                                <Send className="w-5 h-5" />
+                                <span className="hidden sm:inline text-xs font-black uppercase tracking-widest">Consultar</span>
+                            </button>
+                        </form>
                     </div>
+
+                    {searchMode === "ai" && !isAiSearching && (
+                        <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary-300 animate-in fade-in slide-in-from-top-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary-400"></div>
+                            Resultados optimizados por IA para: "{aiQuery}"
+                            <button
+                                onClick={() => { setAiQuery(""); setSearchMode("standard"); loadData(); }}
+                                className="ml-4 text-white/30 hover:text-white underline"
+                            >
+                                Limpiar consulta
+                            </button>
+                        </div>
+                    )}
                 </section>
 
                 {/* Main Content Grid: Table + Detail Panel */}
@@ -196,12 +250,15 @@ export default function CensoPage() {
                             <div className="flex items-center gap-3">
                                 <h3 className="text-xl font-bold text-white drop-shadow-md">Nómina de Comuneros</h3>
                                 <span className="bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full border border-emerald-500/20 font-bold uppercase tracking-wider">
-                                    1,252 Registros
+                                    {filteredComuneros.length} Registros {searchMode === "ai" ? "(Filtrados por IA)" : ""}
                                 </span>
                             </div>
-                            <button className="text-primary-300 text-sm font-bold flex items-center gap-2 hover:text-white transition-all group">
-                                <Download className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
-                                <span>Exportar Reporte</span>
+                            <button
+                                onClick={handleExport}
+                                className="bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 text-sm font-bold px-4 py-2 rounded-xl flex items-center gap-2 transition-all group border border-emerald-500/20"
+                            >
+                                <FileSpreadsheet className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                <span>Exportar a Excel</span>
                             </button>
                         </div>
 

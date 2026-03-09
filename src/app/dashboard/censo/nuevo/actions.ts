@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { generateEmbedding, prepareComuneroText } from "@/utils/embeddings";
 
 export async function registrarComunero(formData: FormData) {
     console.log(">>> Iniciando registrarComunero server action");
@@ -104,7 +105,27 @@ export async function registrarComunero(formData: FormData) {
             // Poblamos columnas legadas para compatibilidad con vistas existentes
             nombres: `${rawData.primerNombre} ${rawData.segundoNombre || ""}`.trim(),
             apellidos: `${rawData.primerApellido} ${rawData.segundoApellido}`.trim(),
-            documento_identidad: rawData.numeroDocumento
+            documento_identidad: rawData.numeroDocumento,
+            // 4. Generate and store embedding
+            embedding: await generateEmbedding(prepareComuneroText({
+                primer_nombre: rawData.primerNombre,
+                segundo_nombre: rawData.segundoNombre,
+                primer_apellido: rawData.primerApellido,
+                segundo_apellido: rawData.segundoApellido,
+                tipo_documento: rawData.tipoDocumento,
+                numero_documento: rawData.numeroDocumento,
+                direccion_actual: rawData.direccion,
+                ocupacion: rawData.ocupacion,
+                nivel_escolaridad: rawData.nivelEscolaridad,
+                regimen_salud: rawData.regimenSalud,
+                eps: rawData.eps,
+                habla_nasayuwe: rawData.hablaNasayuwe,
+                ha_sido_autoridad: rawData.haSidoAutoridad,
+                es_autoridad_actualmente: rawData.esAutoridadActualmente,
+                cargo_autoridad: rawData.cargoAutoridad,
+                genero: rawData.genero,
+                fecha_nacimiento: rawData.fechaNacimiento
+            }))
         });
 
         if (dbError) {
