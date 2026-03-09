@@ -99,7 +99,8 @@ export async function registrarComunero(formData: FormData) {
             habla_nasayuwe: rawData.hablaNasayuwe,
             tiene_discapacidad: rawData.tieneDiscapacidad,
             discapacidades: rawData.discapacidades,
-            foto_url: fotoUrl
+            foto_url: fotoUrl,
+            familia_id: null // Explicitly setting to null for now, as requested
         });
 
         if (dbError) {
