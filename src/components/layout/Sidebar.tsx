@@ -1,6 +1,6 @@
 "use client";
 
-import { Shield, Users, ShieldCheck, Key, ShieldAlert, Settings, LogOut, Map as MapIcon, Wallet, Scale, Heart, FileText, Bot, Home } from "lucide-react";
+import { Shield, Users, ShieldCheck, Key, ShieldAlert, Settings, LogOut, Map as MapIcon, Wallet, Scale, Heart, FileText, Bot, Home, GitBranch } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -21,6 +21,7 @@ export default function Sidebar({ userRole, userName, userInitial }: { userRole:
     const genericLinks = [
         { href: "/dashboard", icon: Home, label: "Resumen General" },
         { href: "/dashboard/censo", icon: Users, label: "Censo Comunitario" },
+        { href: "/dashboard/familias", icon: GitBranch, label: "Gestión de Familias" },
         { href: "#catastro", icon: MapIcon, label: "Catastro Propio" },
         { href: "#finanzas", icon: Wallet, label: "Gestión Financiera" },
         { href: "#justicia", icon: Scale, label: "Justicia Propia" },
