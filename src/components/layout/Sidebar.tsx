@@ -19,8 +19,8 @@ export default function Sidebar({ userRole, userName, userInitial }: { userRole:
     ];
 
     const genericLinks = [
-        { href: "/", icon: Home, label: "Resumen General" },
-        { href: "#censo", icon: Users, label: "Censo Comunitario" },
+        { href: "/dashboard", icon: Home, label: "Resumen General" },
+        { href: "/dashboard/censo", icon: Users, label: "Censo Comunitario" },
         { href: "#catastro", icon: MapIcon, label: "Catastro Propio" },
         { href: "#finanzas", icon: Wallet, label: "Gestión Financiera" },
         { href: "#justicia", icon: Scale, label: "Justicia Propia" },
@@ -70,8 +70,8 @@ export default function Sidebar({ userRole, userName, userInitial }: { userRole:
                             key={idx}
                             href={link.href}
                             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${isActive
-                                    ? 'bg-primary/20 text-white border border-primary/30 shadow-[0_0_10px_rgba(var(--primary)/20)] backdrop-blur-sm'
-                                    : 'text-white/70 hover:bg-white/10 hover:text-white border border-transparent'
+                                ? 'bg-primary/20 text-white border border-primary/30 shadow-[0_0_10px_rgba(var(--primary)/20)] backdrop-blur-sm'
+                                : 'text-white/70 hover:bg-white/10 hover:text-white border border-transparent'
                                 }`}
                         >
                             <link.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-primary-100' : 'group-hover:text-primary-300'}`} />
