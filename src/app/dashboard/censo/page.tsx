@@ -105,11 +105,16 @@ export default function CensoPage() {
     };
 
 
-    const filteredComuneros = comuneros.filter(c =>
-        (c.nombres?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-        (c.apellidos?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-        (c.numero_documento?.toLowerCase() || "").includes(searchTerm.toLowerCase())
-    );
+    const filteredComuneros = comuneros.filter(c => {
+        const searchStr = searchTerm.toLowerCase();
+        const fullName = `${c.primer_nombre || ''} ${c.segundo_nombre || ''} ${c.primer_apellido || ''} ${c.segundo_apellido || ''}`.toLowerCase();
+        const legacyName = `${c.nombres || ''} ${c.apellidos || ''}`.toLowerCase();
+        const docNumber = (c.numero_documento || "").toLowerCase();
+
+        return fullName.includes(searchStr) ||
+            legacyName.includes(searchStr) ||
+            docNumber.includes(searchStr);
+    });
 
     return (
         <div className="flex-1 flex flex-col min-h-0 bg-transparent">
