@@ -55,9 +55,9 @@ export default function FamiliasPage() {
     return (
         <div className="flex-1 flex flex-col min-h-0 bg-transparent">
             {/* Content Area */}
-            <main className="flex-1 p-8 lg:p-12 overflow-y-auto custom-scrollbar">
+            <main className="flex-1 p-4 md:p-6 lg:p-8 flex flex-col min-w-0">
                 {/* Breadcrumbs */}
-                <div className="flex items-center gap-3 text-white/40 text-xs font-bold uppercase tracking-widest mb-8">
+                <div className="flex items-center gap-3 text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-6">
                     <Link href="/dashboard" className="hover:text-primary-300 transition-colors">Gestión Familiar</Link>
                     <ChevronRight className="w-3 h-3" />
                     <span className="text-white">Ficha Familiar</span>
@@ -86,9 +86,9 @@ export default function FamiliasPage() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 mb-10">
                     {/* Main Info Column */}
-                    <div className="lg:col-span-8 space-y-10">
+                    <div className="xl:col-span-8 space-y-8">
 
                         {/* Location Card (Glassmorphism) */}
                         <div className="bg-white/5 backdrop-blur-2xl rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10 group">
@@ -183,7 +183,7 @@ export default function FamiliasPage() {
                     </div>
 
                     {/* Secondary Info Column */}
-                    <div className="space-y-8">
+                    <div className="xl:col-span-4 space-y-6">
 
                         {/* Summary Card */}
                         <div className="bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 shadow-2xl border border-white/10 relative overflow-hidden">
