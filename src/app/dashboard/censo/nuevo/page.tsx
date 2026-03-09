@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     UserPlus,
     ChevronRight,
@@ -23,8 +23,11 @@ import {
     Type
 } from "lucide-react";
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { registrarComunero } from './actions';
 
 export default function NuevoComuneroPage() {
+    const router = useRouter();
     // Form State
     const [formData, setFormData] = useState({
         primerNombre: "",
@@ -53,6 +56,15 @@ export default function NuevoComuneroPage() {
     const [nuevaOcupacion, setNuevaOcupacion] = useState("");
     const [showNuevaOcupacion, setShowNuevaOcupacion] = useState(false);
     const [esMenor, setEsMenor] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // File handled states
+    const [foto, setFoto] = useState<File | null>(null);
+    const [fotoPreview, setFotoPreview] = useState<string | null>(null);
+    const [documentos, setDocumentos] = useState<File[]>([]);
+
+    const fotoInputRef = useRef<HTMLInputElement>(null);
+    const docsInputRef = useRef<HTMLInputElement>(null);
 
     // Disability Options
     const opcionesDiscapacidad = [
@@ -98,6 +110,67 @@ export default function NuevoComuneroPage() {
         }
     };
 
+    const handleFotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setFoto(file);
+            const previewUrl = URL.createObjectURL(file);
+            setFotoPreview(previewUrl);
+        }
+    };
+
+    const handleDocsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        setDocumentos(prev => [...prev, ...files]);
+    };
+
+    const removeDoc = (index: number) => {
+        setDocumentos(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!formData.primerNombre || !formData.numeroDocumento) {
+            alert("Por favor completa los campos obligatorios");
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            const formDataToSend = new FormData();
+
+            // Append data
+            Object.entries(formData).forEach(([key, value]) => {
+                if (key === 'discapacidades') {
+                    formDataToSend.append(key, JSON.stringify(value));
+                } else {
+                    formDataToSend.append(key, value.toString());
+                }
+            });
+
+            // Append files
+            if (foto) formDataToSend.append('foto', foto);
+            documentos.forEach(doc => {
+                formDataToSend.append('documentos', doc);
+            });
+
+            const result = await registrarComunero(formDataToSend);
+
+            if (result.success) {
+                // Success feedback
+                alert("Comunero registrado exitosamente");
+                router.push("/dashboard/censo");
+            } else {
+                alert("Error al registrar: " + result.error);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Ocurrió un error inesperado");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return (
         <div className="flex-1 flex flex-col min-h-0 bg-transparent">
             <main className="flex-1 p-6 lg:p-10 overflow-y-auto custom-scrollbar">
@@ -120,7 +193,7 @@ export default function NuevoComuneroPage() {
                         </div>
                     </div>
 
-                    <form className="space-y-10">
+                    <form className="space-y-10" onSubmit={handleSubmit}>
                         {/* 1. Información Personal */}
                         <section className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 lg:p-10 shadow-2xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[100px] -mr-32 -mt-32"></div>
@@ -337,21 +410,51 @@ export default function NuevoComuneroPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                 <div className="space-y-4">
                                     <p className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Foto de Perfil</p>
-                                    <div className="w-full h-48 rounded-[2rem] border-2 border-dashed border-white/10 bg-black/20 flex flex-col items-center justify-center group hover:border-primary/40 transition-all cursor-pointer">
-                                        <div className="bg-primary/10 p-4 rounded-full mb-3 group-hover:scale-110 transition-transform">
-                                            <Camera className="w-8 h-8 text-primary-300" />
-                                        </div>
-                                        <p className="text-xs font-bold text-white/40">Capturar o Subir Foto</p>
+                                    <input type="file" ref={fotoInputRef} onChange={handleFotoChange} accept="image/*" className="hidden" />
+                                    <div
+                                        onClick={() => fotoInputRef.current?.click()}
+                                        className="w-full h-48 rounded-[2rem] border-2 border-dashed border-white/10 bg-black/20 flex flex-col items-center justify-center group hover:border-primary/40 transition-all cursor-pointer relative overflow-hidden"
+                                    >
+                                        {fotoPreview ? (
+                                            <>
+                                                <img src={fotoPreview} alt="Preview" className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <Camera className="w-8 h-8 text-white" />
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="bg-primary/10 p-4 rounded-full mb-3 group-hover:scale-110 transition-transform">
+                                                    <Camera className="w-8 h-8 text-primary-300" />
+                                                </div>
+                                                <p className="text-xs font-bold text-white/40">Capturar o Subir Foto</p>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
 
                                 <div className="space-y-4">
                                     <p className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Documentos Personales (PDF, JPG)</p>
-                                    <div className="space-y-3">
-                                        <FileCard label="Copia de Cédula de Ciudadanía" status="Pending" />
-                                        <FileCard label="Certificado de Nacimiento" status="Optional" />
-                                        <button type="button" className="w-full py-4 rounded-2xl border-2 border-dashed border-white/5 bg-white/5 text-white/20 text-xs font-bold hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2">
-                                            <Plus className="w-4 h-4" /> Agregar otro documento
+                                    <input type="file" ref={docsInputRef} onChange={handleDocsChange} multiple className="hidden" />
+                                    <div className="space-y-3 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+                                        {documentos.map((doc, idx) => (
+                                            <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group">
+                                                <div className="flex items-center gap-3">
+                                                    <FileText className="w-4 h-4 text-primary-300" />
+                                                    <span className="text-[10px] font-bold text-white/60 truncate max-w-[150px]">{doc.name}</span>
+                                                </div>
+                                                <button type="button" onClick={() => removeDoc(idx)} className="text-white/20 hover:text-red-400 transition-colors">
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        ))}
+
+                                        <button
+                                            type="button"
+                                            onClick={() => docsInputRef.current?.click()}
+                                            className="w-full py-4 rounded-2xl border-2 border-dashed border-white/5 bg-white/5 text-white/20 text-xs font-bold hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <Plus className="w-4 h-4" /> Agregar documentos
                                         </button>
                                     </div>
                                 </div>
@@ -367,9 +470,13 @@ export default function NuevoComuneroPage() {
 
                         {/* Actions */}
                         <div className="flex justify-end gap-4 py-10">
-                            <button type="button" className="px-10 py-4 rounded-2xl border border-white/10 text-white/40 font-black text-sm uppercase tracking-[0.2em] hover:bg-white/5 transition-all">Cancelar</button>
-                            <button type="submit" className="px-12 py-4 rounded-2xl bg-primary text-white font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-primary/40 hover:scale-105 active:scale-95 transition-all border-b-4 border-primary/60">
-                                Guardar Comunero
+                            <button type="button" onClick={() => router.back()} disabled={isSubmitting} className="px-10 py-4 rounded-2xl border border-white/10 text-white/40 font-black text-sm uppercase tracking-[0.2em] hover:bg-white/5 transition-all disabled:opacity-50">Cancelar</button>
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="px-12 py-4 rounded-2xl bg-primary text-white font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-primary/40 hover:scale-105 active:scale-95 transition-all border-b-4 border-primary/60 disabled:opacity-50 disabled:scale-100"
+                            >
+                                {isSubmitting ? 'Guardando...' : 'Guardar Comunero'}
                             </button>
                         </div>
                     </form>
