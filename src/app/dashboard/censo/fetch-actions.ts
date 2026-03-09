@@ -38,13 +38,24 @@ export async function searchComunerosAI(query: string) {
             })
         });
 
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("Gemini Error:", errorData);
+            return [];
+        }
+
         const embeddingData = await response.json();
+        if (!embeddingData.embedding || !embeddingData.embedding.values) {
+            console.error("Unexpected embedding format:", embeddingData);
+            return [];
+        }
+
         const queryEmbedding = embeddingData.embedding.values;
 
         // 2. Search in Supabase using the match_comuneros function
         const { data, error } = await (supabase as any).rpc('match_comuneros', {
             query_embedding: queryEmbedding,
-            match_threshold: 0.3, // Adjust based on needs
+            match_threshold: 0.2, // Lowered threshold for better testing
             match_count: 50
         });
 
