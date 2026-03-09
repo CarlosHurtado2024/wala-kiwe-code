@@ -44,7 +44,7 @@ export async function registrarComunero(formData: FormData) {
                 });
 
             if (photoError) throw photoError;
-            fotoUrl = photoData.path;
+            fotoUrl = photoData?.path || null;
         }
 
         // 2. Upload Documents

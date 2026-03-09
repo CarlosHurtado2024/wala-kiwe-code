@@ -163,9 +163,9 @@ export default function NuevoComuneroPage() {
             } else {
                 alert("Error al registrar: " + result.error);
             }
-        } catch (error) {
-            console.error(error);
-            alert("Ocurrió un error inesperado");
+        } catch (error: any) {
+            console.error("Error completo:", error);
+            alert(`Ocurrió un error inesperado: ${error.message || 'Sin mensaje'}`);
         } finally {
             setIsSubmitting(false);
         }
