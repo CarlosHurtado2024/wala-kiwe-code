@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { getComuneros, searchComunerosAI } from './fetch-actions';
 import { updateComunero } from './update-actions';
+import { syncComunerosAI } from './sync-actions';
 import { exportToExcel } from '@/utils/excel';
 import Link from 'next/link';
 import {
@@ -35,7 +36,8 @@ import {
     Send,
     Sparkles,
     Loader2,
-    FileSpreadsheet
+    FileSpreadsheet,
+    RefreshCw
 } from "lucide-react";
 
 export default function CensoPage() {
@@ -49,6 +51,7 @@ export default function CensoPage() {
     const [editData, setEditData] = useState<any>(null);
     const [aiQuery, setAiQuery] = useState("");
     const [isAiSearching, setIsAiSearching] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
     const [searchMode, setSearchMode] = useState<"standard" | "ai">("standard");
 
     useEffect(() => {
@@ -136,6 +139,20 @@ export default function CensoPage() {
         exportToExcel(filteredComuneros, `Censo_Comunitario_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
+    const handleSyncAI = async () => {
+        setIsSyncing(true);
+        try {
+            const result = await syncComunerosAI();
+            alert(result.message);
+            await loadData();
+        } catch (error) {
+            console.error(error);
+            alert("Error al sincronizar");
+        } finally {
+            setIsSyncing(false);
+        }
+    };
+
     const filteredComuneros = comuneros.filter(c => {
         const searchStr = searchTerm.toLowerCase();
         const fullName = `${c.primer_nombre || ''} ${c.segundo_nombre || ''} ${c.primer_apellido || ''} ${c.segundo_apellido || ''}`.toLowerCase();
@@ -176,6 +193,14 @@ export default function CensoPage() {
                         <UserPlus className="w-4 h-4" />
                         <span>Nuevo Comunero</span>
                     </Link>
+                    <button
+                        onClick={handleSyncAI}
+                        disabled={isSyncing}
+                        title="Sincronizar datos con la IA"
+                        className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 transition-colors disabled:opacity-50"
+                    >
+                        <RefreshCw className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`} />
+                    </button>
                     <button className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 transition-colors">
                         <Bell className="w-5 h-5" />
                     </button>
