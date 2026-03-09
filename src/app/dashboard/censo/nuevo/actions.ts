@@ -100,7 +100,11 @@ export async function registrarComunero(formData: FormData) {
             tiene_discapacidad: rawData.tieneDiscapacidad,
             discapacidades: rawData.discapacidades,
             foto_url: fotoUrl,
-            familia_id: null // Explicitly setting to null for now, as requested
+            familia_id: null,
+            // Poblamos columnas legadas para compatibilidad con vistas existentes
+            nombres: `${rawData.primerNombre} ${rawData.segundoNombre || ""}`.trim(),
+            apellidos: `${rawData.primerApellido} ${rawData.segundoApellido}`.trim(),
+            documento_identidad: rawData.numeroDocumento
         });
 
         if (dbError) {
