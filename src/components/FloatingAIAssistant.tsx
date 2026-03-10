@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, X, MessageSquare, Send, Loader2, Maximize2, Minimize2 } from 'lucide-react';
 import { askFloatingKomi } from '@/app/dashboard/FloatingChatAction';
 import ReactMarkdown from 'react-markdown';
+import dynamic from 'next/dynamic';
+const DataVisualization = dynamic(() => import('@/components/DataVisualization'), { ssr: false });
 import remarkGfm from 'remark-gfm';
 
 type ChatMessage = {
@@ -42,7 +44,8 @@ export default function FloatingAIAssistant() {
         setIsLoading(true);
 
         try {
-            const response = await askFloatingKomi(userMsg);
+            const historyToPass = messages.map(m => ({ role: m.role, content: m.content }));
+            const response = await askFloatingKomi(userMsg, historyToPass);
             setMessages(prev => [...prev, {
                 role: "assistant",
                 content: response.answer,
@@ -60,35 +63,7 @@ export default function FloatingAIAssistant() {
         }
     };
 
-    const renderDynamicTable = (data: any[]) => {
-        if (!data || data.length === 0) return null;
-        const columns = Object.keys(data[0]);
 
-        return (
-            <div className={`mt-4 overflow-x-auto rounded-xl border border-white/10 bg-slate-900/50 ${isExpanded ? 'max-h-[500px]' : 'max-h-[300px]'}`}>
-                <table className="w-full text-left text-xs whitespace-nowrap">
-                    <thead className="sticky top-0 bg-slate-800 text-white/50 uppercase font-black tracking-widest border-b border-white/10">
-                        <tr>
-                            {columns.map(col => (
-                                <th key={col} className="px-4 py-3">{col.replace(/_/g, ' ')}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                        {data.map((row, idx) => (
-                            <tr key={idx} className="hover:bg-white/5 transition-colors">
-                                {columns.map(col => (
-                                    <td key={col} className="px-4 py-3 text-white/80">
-                                        {String(row[col] === null || row[col] === undefined ? '-' : typeof row[col] === 'object' ? JSON.stringify(row[col]) : row[col])}
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        );
-    };
 
     return (
         <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end">
@@ -156,9 +131,11 @@ export default function FloatingAIAssistant() {
                                                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                                             )}
                                         </div>
-                                        {msg.tableData && msg.tableData.length > 0 && renderDynamicTable(msg.tableData)}
+                                        {msg.tableData && msg.tableData.length > 0 && !isLoading && (
+                                            <DataVisualization data={msg.tableData} question={msg.content} />
+                                        )}
                                         {msg.tableData && msg.tableData.length === 0 && (
-                                            <div className="mt-2 text-xs text-white/40 italic">La consulta no arrojó resultados para mostrar en tabla.</div>
+                                            <div className="mt-2 text-xs text-white/40 italic">La consulta no arrojó resultados adicionales para graficar.</div>
                                         )}
                                     </div>
                                 </div>

@@ -7,8 +7,8 @@ export async function parseQueryToFilters(query: string) {
         
         Campos disponibles para filtrar y sus reglas lógicas:
         - genero: Si la consulta dice algo como "hombres", "masculino", "hombres y niños", retorna "M". Si dice "mujeres", "femenino", "niñas", retorna "F".
-        - es_autoridad_actualmente: boolean. Si dicen "solo autoridades" o "quienes sean autoridad" -> true. "que no sean autoridad" -> false.
-        - ha_sido_autoridad: boolean. Si dicen "ex autoridades" o "ya fueron autoridad" -> true.
+        - rol_autoridad: Si dicen "autoridad", "gobernador", "cabildo" u similar, puedes retornar algo como { "rol_autoridad": "gobernador" }, o no usarlo si no estás seguro del rol. Es una cadena (ej. 'gobernador', 'tesorero').
+        - es_guardia_indigena: boolean. Si buscan "la guardia", "los guardias" -> true.
 
         NOTA: Para términos abstractos o de profesiones (ej. "profesores", "agricultores", "personas en el pomar"), NO crees filtros JSON. Deja que la búsqueda semántica vectorial haga ese trabajo. SOLO crea filtros JSON para los campos listados arriba cuando sea explicito.
         
