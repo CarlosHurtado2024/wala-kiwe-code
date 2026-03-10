@@ -54,8 +54,8 @@ export async function askFloatingKomi(question: string) {
 
     try {
         const genAI = new GoogleGenerativeAI(key);
-        // Using "gemini-2.5-flash" to avoid quota exhausted issues from gemini-2.0-flash
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        // Using "gemini-2.0-flash" which is the correct and stable model name
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
         const prompt = `${DB_SCHEMA}\nPregunta del usuario: "${question}"\nRespuesta JSON pura:\n`;
         const result = await model.generateContent(prompt);
