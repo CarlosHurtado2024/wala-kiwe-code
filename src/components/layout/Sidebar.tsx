@@ -3,6 +3,7 @@
 import { Shield, Users, ShieldCheck, Key, ShieldAlert, Settings, LogOut, Map as MapIcon, Wallet, Scale, Heart, FileText, Bot, Home, GitBranch } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logout } from "@/app/login/actions";
 
 type AppRole = 'administrador' | 'autoridad' | 'comunero' | 'guardia_indigena' | 'promotor_salud';
 
@@ -103,7 +104,7 @@ export default function Sidebar({ userRole, userName, userInitial }: { userRole:
                         <p className="text-sm font-bold truncate text-white">{userName}</p>
                         <p className="text-[10px] text-white/60 truncate uppercase tracking-widest font-semibold">{getRoleDisplayName(userRole)}</p>
                     </div>
-                    <form action="/login">
+                    <form action={logout}>
                         <button type="submit" className="p-1 hover:text-red-400 transition-colors" title="Cerrar Sesión">
                             <LogOut className="w-5 h-5 text-white/50 hover:text-red-400" />
                         </button>
