@@ -50,7 +50,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // Redirección si ya está autenticado fuera de landing o login
-    if (user && (pathname === "/login" || pathname === "/")) {
+    if (user && pathname === "/login") {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);
