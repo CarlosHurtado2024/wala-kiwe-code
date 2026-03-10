@@ -12,7 +12,7 @@ async function callGeminiRAG(prompt: string, context: string) {
 REGLA DE ORO: Responde conversacionalmente de forma estricta basándote en la información de los comuneros proporcionada en el contexto. Si no hay información, di que no se encontraron registros. Sé claro, profesional y directo. Muestra totales si es relevante.`;
 
     const genAI = new GoogleGenerativeAI(key);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const fullPrompt = `${systemPrompt}\n\n--- CONTEXTO RECUPERADO DE LA BASE DE DATOS ---\n${context}\n--- FIN DEL CONTEXTO ---\n\nConsulta del usuario: "${prompt}"\n\nRespuesta:`;
 
