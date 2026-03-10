@@ -3,7 +3,8 @@ import * as dotenv from "dotenv";
 
 dotenv.config({ path: ".env.local" });
 
-const key = process.env.GEMINI_API_KEY || "AIzaSyB6g6yQnrCunfeyw2udIYYWZ2tOlxr4x4w";
+const key = process.env.GEMINI_API_KEY;
+if (!key) throw new Error("GEMINI_API_KEY no definida");
 
 async function main() {
     try {
