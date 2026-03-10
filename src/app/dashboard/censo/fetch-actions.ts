@@ -40,7 +40,7 @@ export async function searchComunerosAI(query: string) {
 
     // 1. Get embedding for the query using Gemini
     // For now, we assume GEMINI_API_KEY is in process.env
-    const geminiApiKey = process.env.GEMINI_API_KEY;
+    const geminiApiKey = process.env.GEMINI_API_KEY?.trim();
     if (!geminiApiKey) {
         throw new Error("GEMINI_API_KEY no está configurada");
     }

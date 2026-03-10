@@ -46,7 +46,7 @@ Instrucciones para la Inteligencia Artificial (Text-to-SQL):
 
 export async function askFloatingKomi(question: string) {
     const supabase = await createClient();
-    const key = process.env.GEMINI_API_KEY;
+    const key = process.env.GEMINI_API_KEY?.trim();
 
     if (!key) {
         return { answer: "⚠️ El módulo de IA no está configurado (Falta GEMINI_API_KEY).", tableData: null, error: true };
