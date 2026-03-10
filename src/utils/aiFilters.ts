@@ -1,5 +1,5 @@
 export async function parseQueryToFilters(query: string) {
-    const key = process.env.GEMINI_API_KEY?.trim();
+    const key = process.env.GROQ_API_KEY?.trim();
     if (!key) return {};
 
     try {
@@ -12,31 +12,35 @@ export async function parseQueryToFilters(query: string) {
 
         NOTA: Para términos abstractos o de profesiones (ej. "profesores", "agricultores", "personas en el pomar"), NO crees filtros JSON. Deja que la búsqueda semántica vectorial haga ese trabajo. SOLO crea filtros JSON para los campos listados arriba cuando sea explicito.
         
-        Consulta del usuario: "${query}"
-        
-        Salida esperada (solo JSON):`;
+        Consulta del usuario: "${query}"`;
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${key}`,
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
+                model: "llama-3.1-70b-versatile",
+                messages: [
+                    { role: "system", content: "Retorna solo JSON válido." },
+                    { role: "user", content: prompt }
+                ],
+                temperature: 0,
+                response_format: { type: "json_object" }
             })
         });
-        const result = await response.json();
 
         if (!response.ok) {
-            console.error("Fetch API error Gemini:", result);
+            const err = await response.json();
+            console.error("Groq filter error:", err);
             return {};
         }
 
-        const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        const data = await response.json();
+        const text = data.choices[0]?.message?.content || "{}";
+        return JSON.parse(text);
 
-        if (jsonMatch) {
-            return JSON.parse(jsonMatch[0]);
-        }
-        return {};
     } catch (e) {
         console.error("AI filter extraction failed (continuing without hard filters):", e);
         return {};

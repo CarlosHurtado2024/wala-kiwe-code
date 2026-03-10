@@ -4,20 +4,36 @@ import { createClient } from "@/utils/supabase/server";
 import { parseQueryToFilters } from "@/utils/aiFilters";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-async function callGeminiRAG(prompt: string, context: string) {
-    const key = process.env.GEMINI_API_KEY;
-    if (!key) throw new Error("GEMINI_API_KEY no está configurada");
+async function callGroqRAG(prompt: string, context: string) {
+    const key = process.env.GROQ_API_KEY?.trim();
+    if (!key) throw new Error("GROQ_API_KEY no está configurada");
 
     const systemPrompt = `Eres un asistente experto del Módulo de Censo de la comunidad indígena Wala Kiwe.
 REGLA DE ORO: Responde conversacionalmente de forma estricta basándote en la información de los comuneros proporcionada en el contexto. Si no hay información, di que no se encontraron registros. Sé claro, profesional y directo. Muestra totales si es relevante.`;
 
-    const genAI = new GoogleGenerativeAI(key);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${key}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            model: "llama-3.1-70b-versatile",
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: `CONTEXTO:\n${context}\n\nPregunta: ${prompt}` }
+            ],
+            temperature: 0.1
+        })
+    });
 
-    const fullPrompt = `${systemPrompt}\n\n--- CONTEXTO RECUPERADO DE LA BASE DE DATOS ---\n${context}\n--- FIN DEL CONTEXTO ---\n\nConsulta del usuario: "${prompt}"\n\nRespuesta:`;
+    if (!response.ok) {
+        const err = await response.json();
+        throw new Error(`Groq error: ${err.error?.message || response.statusText}`);
+    }
 
-    const result = await model.generateContent(fullPrompt);
-    return result.response.text();
+    const data = await response.json();
+    return data.choices[0]?.message?.content || "";
 }
 export async function getComuneros() {
     const supabase = await createClient();
@@ -106,7 +122,7 @@ export async function searchComunerosAI(query: string) {
 
         let answer = "";
         try {
-            answer = await callGeminiRAG(query, contextText);
+            answer = await callGroqRAG(query, contextText);
         } catch (e) {
             console.error("RAG Error:", e);
             answer = "No pude generar un resumen conversacional, pero aquí están los resultados tabulados.";

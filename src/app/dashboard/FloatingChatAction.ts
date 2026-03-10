@@ -46,28 +46,38 @@ Instrucciones para la Inteligencia Artificial (Text-to-SQL):
 
 export async function askFloatingKomi(question: string) {
     const supabase = await createClient();
-    const key = process.env.GEMINI_API_KEY?.trim();
+    const key = process.env.GROQ_API_KEY?.trim();
 
     if (!key) {
-        return { answer: "⚠️ El módulo de IA no está configurado (Falta GEMINI_API_KEY).", tableData: null, error: true };
+        return { answer: "⚠️ El módulo de IA no está configurado (Falta GROQ_API_KEY).", tableData: null, error: true };
     }
 
     try {
-        const genAI = new GoogleGenerativeAI(key);
-        // Using "gemini-1.5-flash" which is the most stable and available model
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${key}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                model: "llama-3.1-70b-versatile",
+                messages: [
+                    { role: "system", content: DB_SCHEMA },
+                    { role: "user", content: question }
+                ],
+                temperature: 0.2,
+                response_format: { type: "json_object" }
+            })
+        });
 
-        const prompt = `${DB_SCHEMA}\nPregunta del usuario: "${question}"\nRespuesta JSON pura:\n`;
-        const result = await model.generateContent(prompt);
-        const textResponse = result.response.text();
-
-        // Extract JSON safely
-        const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            return { answer: "Hubo un error interpretando tu solicitud. Por favor intenta ser más específico.", tableData: null, error: true };
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(`Groq API error: ${error.error?.message || response.statusText}`);
         }
 
-        const aiData = JSON.parse(jsonMatch[0]);
+        const data = await response.json();
+        const textResponse = data.choices[0]?.message?.content || "";
+        const aiData = JSON.parse(textResponse);
 
         if (aiData.necesita_tabla && aiData.sql_query && typeof aiData.sql_query === 'string') {
             const cleanSql = aiData.sql_query.replace(/;/g, '').trim(); // Remove semicolon for safety execution
