@@ -46,8 +46,14 @@ export async function askFloatingKomi(question: string) {
             })
         });
 
+        if (!firstResponse.ok) {
+            const err = await firstResponse.json();
+            throw new Error(`Error en Paso 1 (SQL): ${err.error?.message || firstResponse.statusText}`);
+        }
+
         const firstData = await firstResponse.json();
-        const aiAnalysis = JSON.parse(firstData.choices[0]?.message?.content || "{}");
+        const firstContent = firstData.choices?.[0]?.message?.content || "{}";
+        const aiAnalysis = JSON.parse(firstContent);
 
         let dbResults = null;
         if (aiAnalysis.sql_query) {
@@ -79,8 +85,13 @@ export async function askFloatingKomi(question: string) {
             })
         });
 
+        if (!finalResponse.ok) {
+            const err = await finalResponse.json();
+            throw new Error(`Error en Paso 2 (Chat): ${err.error?.message || finalResponse.statusText}`);
+        }
+
         const finalData = await finalResponse.json();
-        const answer = finalData.choices[0]?.message?.content || "No pude generar una respuesta.";
+        const answer = finalData.choices?.[0]?.message?.content || "No pude generar una respuesta.";
 
         return {
             answer: answer,

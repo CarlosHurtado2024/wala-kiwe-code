@@ -3,6 +3,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, X, MessageSquare, Send, Loader2, Maximize2, Minimize2 } from 'lucide-react';
 import { askFloatingKomi } from '@/app/dashboard/FloatingChatAction';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 type ChatMessage = {
     role: "user" | "assistant";
@@ -144,7 +146,15 @@ export default function FloatingAIAssistant() {
                                                 ? 'bg-red-500/10 text-red-200 border border-red-500/20 rounded-tl-sm'
                                                 : 'bg-white/5 border border-white/10 text-white/80 rounded-tl-sm'
                                             }`}>
-                                            <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                                            {msg.role === 'assistant' ? (
+                                                <div className="text-sm leading-relaxed prose prose-invert prose-p:leading-relaxed prose-strong:text-primary-300 prose-strong:font-bold max-w-none">
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                        {msg.content}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            ) : (
+                                                <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                                            )}
                                         </div>
                                         {msg.tableData && msg.tableData.length > 0 && renderDynamicTable(msg.tableData)}
                                         {msg.tableData && msg.tableData.length === 0 && (
