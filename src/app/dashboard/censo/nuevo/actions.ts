@@ -107,7 +107,7 @@ export async function registrarComunero(formData: FormData) {
             apellidos: `${rawData.primerApellido} ${rawData.segundoApellido}`.trim(),
             documento_identidad: rawData.numeroDocumento,
             // 4. Generate and store embedding
-            embedding: await generateEmbedding(prepareComuneroText({
+            embedding: await generateEmbedding(await prepareComuneroText({
                 primer_nombre: rawData.primerNombre,
                 segundo_nombre: rawData.segundoNombre,
                 primer_apellido: rawData.primerApellido,

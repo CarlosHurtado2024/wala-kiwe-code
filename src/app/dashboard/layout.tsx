@@ -1,6 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
+import FloatingAIAssistant from "@/components/FloatingAIAssistant";
 import { Database } from "@/utils/supabase/database.types";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -40,6 +41,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <main className="relative z-10 flex-1 overflow-y-auto scroll-smooth flex flex-col">
                 {children}
             </main>
+
+            {/* Global AI Assistant */}
+            <FloatingAIAssistant />
         </div>
     );
 }

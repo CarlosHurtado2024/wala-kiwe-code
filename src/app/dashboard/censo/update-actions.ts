@@ -33,7 +33,7 @@ export async function updateComunero(id: string, formData: FormData) {
         // Legacy columns for compatibility
         nombres: `${rawData.primer_nombre} ${rawData.segundo_nombre || ""}`.trim(),
         apellidos: `${rawData.primer_apellido} ${rawData.segundo_apellido}`.trim(),
-        embedding: await generateEmbedding(prepareComuneroText(rawData))
+        embedding: await generateEmbedding(await prepareComuneroText(rawData))
     };
 
     const { error } = await (supabase.from("comuneros") as any)

@@ -6,11 +6,11 @@ export async function generateEmbedding(text: string) {
         throw new Error("GEMINI_API_KEY no está configurada");
     }
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${geminiApiKey}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${geminiApiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            model: "models/text-embedding-004",
+            model: "models/gemini-embedding-001",
             content: { parts: [{ text: text }] }
         })
     });
@@ -25,6 +25,7 @@ export async function generateEmbedding(text: string) {
 }
 
 export async function prepareComuneroText(c: any) {
+    const generoTexto = c.genero === 'M' ? 'Masculino, Hombre' : c.genero === 'F' ? 'Femenino, Mujer' : c.genero;
     return `Comunero: ${c.primer_nombre} ${c.segundo_nombre || ''} ${c.primer_apellido} ${c.segundo_apellido}. 
     Documento: ${c.tipo_documento} ${c.numero_documento}.
     Ubicación: ${c.direccion_actual || 'No registrada'}.
@@ -33,5 +34,5 @@ export async function prepareComuneroText(c: any) {
     Salud: Régimen ${c.regimen_salud}, EPS ${c.eps || 'No registrada'}.
     Cultura: Nasayuwe ${c.habla_nasayuwe}.
     Autoridad: ${c.ha_sido_autoridad ? 'Ha sido autoridad' : 'No ha sido autoridad'}. ${c.es_autoridad_actualmente ? 'Es autoridad actualmente como ' + c.cargo_autoridad : ''}.
-    Género: ${c.genero}. Edad aproximada: ${c.fecha_nacimiento ? (new Date().getFullYear() - new Date(c.fecha_nacimiento).getFullYear()) : 'Desconocida'}.`.replace(/\s+/g, ' ').trim();
+    Género: ${generoTexto}. Edad aproximada: ${c.fecha_nacimiento ? (new Date().getFullYear() - new Date(c.fecha_nacimiento).getFullYear()) : 'Desconocida'}.`.replace(/\s+/g, ' ').trim();
 }

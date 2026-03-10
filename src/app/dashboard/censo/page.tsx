@@ -50,6 +50,7 @@ export default function CensoPage() {
     const [isSaving, setIsSaving] = useState(false);
     const [editData, setEditData] = useState<any>(null);
     const [aiQuery, setAiQuery] = useState("");
+    const [aiAnswer, setAiAnswer] = useState("");
     const [isAiSearching, setIsAiSearching] = useState(false);
     const [isSyncing, setIsSyncing] = useState(false);
     const [searchMode, setSearchMode] = useState<"standard" | "ai">("standard");
@@ -124,9 +125,11 @@ export default function CensoPage() {
 
         setIsAiSearching(true);
         setSearchMode("ai");
+        setAiAnswer("");
         try {
-            const results = await searchComunerosAI(aiQuery);
+            const { results, answer } = await searchComunerosAI(aiQuery);
             setComuneros(results);
+            setAiAnswer(answer);
         } catch (error) {
             console.error(error);
             alert("Error en la búsqueda con IA. Verifica la GEMINI_API_KEY.");
@@ -253,15 +256,30 @@ export default function CensoPage() {
                     </div>
 
                     {searchMode === "ai" && !isAiSearching && (
-                        <div className="mt-4 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary-300 animate-in fade-in slide-in-from-top-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary-400"></div>
-                            Resultados optimizados por IA para: "{aiQuery}"
-                            <button
-                                onClick={() => { setAiQuery(""); setSearchMode("standard"); loadData(); }}
-                                className="ml-4 text-white/30 hover:text-white underline"
-                            >
-                                Limpiar consulta
-                            </button>
+                        <div className="mt-8 flex flex-col gap-4 animate-in fade-in slide-in-from-top-2">
+                            {/* RAG Answer Bubble */}
+                            {aiAnswer && (
+                                <div className="bg-primary/10 border border-primary/20 rounded-2xl p-6 relative">
+                                    <div className="absolute -top-3 -left-3 bg-primary text-white p-2 rounded-xl shadow-lg shadow-primary/30">
+                                        <Sparkles className="w-5 h-5" />
+                                    </div>
+                                    <h4 className="text-secondary-100 font-bold mb-2 ml-4">Komi Censo (IA):</h4>
+                                    <p className="text-sm text-white/80 leading-relaxed ml-4 whitespace-pre-wrap">
+                                        {aiAnswer}
+                                    </p>
+                                </div>
+                            )}
+
+                            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary-300">
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary-400"></div>
+                                Resultados filtrados en tabla para: "{aiQuery}"
+                                <button
+                                    onClick={() => { setAiQuery(""); setAiAnswer(""); setSearchMode("standard"); loadData(); }}
+                                    className="ml-4 text-white/30 hover:text-white underline"
+                                >
+                                    Limpiar consulta
+                                </button>
+                            </div>
                         </div>
                     )}
                 </section>
