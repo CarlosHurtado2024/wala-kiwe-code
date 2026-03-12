@@ -3,66 +3,67 @@ import Image from 'next/image';
 
 export default function LandingPage() {
     return (
-        <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden font-sans bg-slate-50 text-slate-900 selection:bg-primary/20">
-            {/* Background Pattern */}
+        <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden font-sans bg-background text-foreground">
+            {/* Background Pattern - subtle noise/dots */}
             <div
-                className="fixed inset-0 z-0 opacity-50 pointer-events-none"
+                className="fixed inset-0 z-0 opacity-30 pointer-events-none"
                 style={{
-                    backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(25, 122, 230, 0.05) 1px, transparent 0)',
-                    backgroundSize: '24px 24px'
+                    backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(0, 0, 0, 0.03) 1px, transparent 0)',
+                    backgroundSize: '32px 32px'
                 }}
             />
 
-            {/* Navigation (Glassmorphism) */}
-            <header className="fixed top-0 z-50 w-full border-b border-white/20 bg-white/40 backdrop-blur-xl px-6 lg:px-20 py-4 flex items-center justify-between shadow-sm">
+            {/* Navigation */}
+            <header className="fixed top-0 z-50 w-full border-b border-border bg-card/80 backdrop-blur-xl px-6 lg:px-20 py-4 flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-3">
-                    <div className="bg-primary p-2 rounded-xl text-primary-foreground shadow-lg shadow-primary/20">
+                    <div className="bg-primary/10 p-2 rounded-xl text-primary border border-primary/20">
                         <span className="material-symbols-outlined text-2xl">landscape</span>
                     </div>
-                    <h2 className="text-slate-900 text-xl font-extrabold tracking-tight">Wala Kiwe</h2>
+                    <h2 className="text-foreground text-xl font-extrabold tracking-tight">Wala Kiwe</h2>
                 </div>
                 <nav className="hidden md:flex flex-1 justify-center gap-8">
-                    <a className="text-slate-600 hover:text-primary text-sm font-semibold transition-colors" href="#pilares">Pilares</a>
-                    <a className="text-slate-600 hover:text-primary text-sm font-semibold transition-colors" href="#tecnologia">Tecnología</a>
-                    <a className="text-slate-600 hover:text-primary text-sm font-semibold transition-colors" href="#impacto">Impacto</a>
-                    <a className="text-slate-600 hover:text-primary text-sm font-semibold transition-colors" href="#acceso">Acceso</a>
+                    <a className="text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors" href="#pilares">Pilares</a>
+                    <a className="text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors" href="#tecnologia">Tecnología</a>
+                    <a className="text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors" href="#impacto">Impacto</a>
+                    <a className="text-muted-foreground hover:text-foreground text-sm font-semibold transition-colors" href="#acceso">Acceso</a>
                 </nav>
                 <div className="flex items-center gap-4">
-                    <Link href="/login" className="hidden sm:flex items-center justify-center rounded-xl h-10 px-6 bg-primary text-primary-foreground text-sm font-bold tracking-wide hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                    <Link href="/login" className="hidden sm:flex items-center justify-center rounded-xl h-10 px-6 bg-primary text-primary-foreground text-sm font-bold tracking-wide hover:opacity-90 transition-opacity shadow-sm">
                         Ingresar al Sistema
                     </Link>
                 </div>
             </header>
 
             <main className="flex-1 mt-20 z-10">
-                {/* Hero Section (Glassmorphism) */}
+                {/* Hero Section */}
                 <section className="relative px-4 lg:px-20 py-10 lg:py-16">
                     <div className="max-w-7xl mx-auto">
-                        <div className="relative min-h-[520px] lg:min-h-[640px] flex flex-col justify-end overflow-hidden rounded-3xl p-8 lg:p-16 shadow-2xl border border-white/40">
+                        <div className="relative min-h-[520px] lg:min-h-[640px] flex flex-col justify-end overflow-hidden rounded-[2.5rem] p-8 lg:p-16 shadow-lg border border-border bg-card">
                             {/* Hero Background Image */}
                             <div className="absolute inset-0 z-0">
                                 <img
                                     alt="Paisaje del Páramo del Cauca"
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover opacity-90"
                                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHdrWPtkppF6AK3F5R1RygEiPq1PzhPS4vgPZVg4-U_Rm7jvOwfustmgxN7_IztseqErzWg0GPw4kI8yQbGJaQhbnneU_lObapGpiFDsxE0_07JFETCceFEYR6D9FhDluCG7wvRcprZPyImzq8AVK2eiOjuhsTL5EZtf_v4wn3Tt4c8d8v6XLRb3t_keIOjCAWoWMt0Ua3Z5uuJLOFtY3fKTGSql2wumXMMdSg4FOAiu3KktTjAtpv5SAryE2fLoA5xN4B4OUxEfM"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-slate-900/10 backdrop-blur-[2px]"></div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/60 to-background/20 backdrop-blur-[1px]"></div>
                             </div>
 
-                            <div className="relative z-10 flex flex-col gap-6 max-w-2xl bg-black/20 p-8 rounded-3xl backdrop-blur-md border border-white/10 shadow-2xl">
-                                <h1 className="text-white text-5xl lg:text-7xl font-black leading-tight tracking-tight drop-shadow-md">
-                                    Soberanía Digital para el Territorio <span className="text-primary-foreground">Wala Kiwe</span>
+                            <div className="relative z-10 flex flex-col gap-6 max-w-2xl bg-card/80 p-8 rounded-3xl backdrop-blur-xl border border-border shadow-sm">
+                                <h1 className="text-foreground text-5xl lg:text-7xl font-black leading-tight tracking-tight">
+                                    Soberanía Digital para el Territorio <span className="text-primary block">Wala Kiwe</span>
                                 </h1>
-                                <p className="text-slate-100 text-lg lg:text-xl font-medium leading-relaxed drop-shadow">
+                                <p className="text-muted-foreground text-lg lg:text-xl font-medium leading-relaxed">
                                     Fortaleciendo el gobierno propio a través de la tecnología y la tradición ancestral del Cauca.
                                 </p>
                                 <div className="flex flex-wrap gap-4 mt-4">
-                                    <Link href="/login" className="flex items-center justify-center h-14 px-8 rounded-xl bg-primary text-primary-foreground text-lg font-bold shadow-xl shadow-primary/30 hover:scale-105 transition-transform backdrop-blur-md">
+                                    <Link href="/login" className="flex items-center justify-center h-14 px-8 rounded-xl bg-primary text-primary-foreground text-lg font-bold shadow-sm hover:scale-[1.02] transition-transform">
                                         Ingresar al Sistema
                                     </Link>
-                                    <button className="flex items-center justify-center h-14 px-8 rounded-xl bg-white/10 backdrop-blur-md border border-white/30 text-white text-lg font-bold hover:bg-white/20 transition-all">
+                                    <button className="flex items-center justify-center h-14 px-8 rounded-xl bg-secondary border border-border text-foreground text-lg font-bold hover:bg-muted transition-colors">
                                         Conocer más
                                     </button>
+
                                 </div>
                             </div>
                         </div>
@@ -74,8 +75,8 @@ export default function LandingPage() {
                     <div className="max-w-7xl mx-auto relative z-10">
                         <div className="flex flex-col mb-16 max-w-3xl">
                             <span className="text-primary font-bold tracking-widest uppercase text-sm mb-2">Fundamentos</span>
-                            <h2 className="text-slate-900 text-4xl lg:text-5xl font-black mb-4">Nuestros Pilares</h2>
-                            <p className="text-slate-600 text-lg leading-relaxed">
+                            <h2 className="text-foreground text-4xl lg:text-5xl font-black mb-4">Nuestros Pilares</h2>
+                            <p className="text-muted-foreground text-lg leading-relaxed">
                                 Módulos centrales diseñados específicamente para la gestión autónoma del territorio y el fortalecimiento de la comunidad.
                             </p>
                         </div>
@@ -87,49 +88,47 @@ export default function LandingPage() {
                                 { icon: 'gavel', title: 'Justicia Indígena', desc: 'Aplicación del Derecho Propio y armonización de conflictos territoriales.' },
                                 { icon: 'ecg_heart', title: 'Salud Intercultural', desc: 'Digitalización de saberes ancestrales y gestión de medicina tradicional.' },
                             ].map((pillar, index) => (
-                                <div key={index} className="group p-8 rounded-3xl border border-white/40 bg-white/50 backdrop-blur-xl shadow-lg hover:shadow-2xl hover:border-primary/30 hover:-translate-y-2 transition-all duration-300">
-                                    <div className="text-primary mb-6 group-hover:scale-110 transition-transform bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center">
+                                <div key={index} className="group p-8 rounded-3xl border border-border bg-card shadow-sm hover:shadow-md hover:border-primary/40 hover:-translate-y-1 transition-all duration-300">
+                                    <div className="text-primary mb-6 group-hover:scale-110 transition-transform bg-primary/10 w-16 h-16 rounded-2xl flex items-center justify-center border border-primary/20">
                                         <span className="material-symbols-outlined text-3xl">{pillar.icon}</span>
                                     </div>
-                                    <h3 className="text-slate-900 text-xl font-bold mb-3">{pillar.title}</h3>
-                                    <p className="text-slate-600 text-sm leading-relaxed">{pillar.desc}</p>
+                                    <h3 className="text-foreground text-xl font-bold mb-3">{pillar.title}</h3>
+                                    <p className="text-muted-foreground text-sm leading-relaxed">{pillar.desc}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </section>
 
-                {/* Tecnología con Identidad (Glassmorphism) */}
-                <section className="px-6 lg:px-20 py-20 relative overflow-hidden" id="tecnologia">
-                    {/* Decorative blurred blobs */}
-                    <div className="absolute -left-40 top-20 w-96 h-96 bg-primary/20 rounded-full blur-[100px] pointer-events-none"></div>
-                    <div className="absolute right-0 bottom-0 w-[500px] h-[500px] bg-secondary/30 rounded-full blur-[120px] pointer-events-none"></div>
+                <section className="px-6 lg:px-20 py-20 relative overflow-hidden bg-secondary/30" id="tecnologia">
+                    {/* Decorative blobs */}
+                    <div className="absolute -left-40 top-20 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
 
                     <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 relative z-10">
                         <div className="flex-1">
                             <span className="text-primary font-bold tracking-widest uppercase text-sm mb-2">Innovación</span>
-                            <h2 className="text-slate-900 text-4xl lg:text-5xl font-black mb-6 leading-tight">Tecnología con Identidad Ancestral</h2>
-                            <p className="text-slate-600 text-lg mb-8 leading-relaxed">
+                            <h2 className="text-foreground text-4xl lg:text-5xl font-black mb-6 leading-tight">Tecnología con Identidad Ancestral</h2>
+                            <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
                                 Nuestra plataforma no solo procesa datos; entiende nuestra ley de origen. Desarrollamos herramientas que protegen nuestros derechos frente a la modernidad.
                             </p>
 
-                            <div className="bg-white/60 backdrop-blur-2xl p-8 rounded-3xl border border-white shadow-xl relative overflow-hidden">
-                                <div className="absolute right-0 top-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
+                            <div className="bg-card p-8 rounded-3xl border border-border shadow-sm relative overflow-hidden">
+                                <div className="absolute right-0 top-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl"></div>
                                 <div className="flex gap-4 items-start relative z-10">
                                     <div className="bg-primary/10 p-4 rounded-2xl text-primary border border-primary/20 shadow-inner">
                                         <span className="material-symbols-outlined text-3xl">psychology</span>
                                     </div>
                                     <div>
-                                        <h4 className="text-slate-900 text-xl font-bold mb-2">Asistente Legal IA</h4>
-                                        <p className="text-slate-600 leading-relaxed mb-4">
+                                        <h4 className="text-foreground text-xl font-bold mb-2">Asistente Legal IA</h4>
+                                        <p className="text-muted-foreground leading-relaxed mb-4">
                                             Protección de los derechos comunitarios mediante inteligencia artificial especializada en legislación indígena y Derecho Mayor.
                                         </p>
                                         <ul className="space-y-3">
-                                            <li className="flex items-center gap-3 text-slate-700 font-medium">
+                                            <li className="flex items-center gap-3 text-foreground/80 font-medium">
                                                 <div className="bg-primary/20 p-1 rounded-full"><span className="material-symbols-outlined text-primary text-sm block">check</span></div>
                                                 Análisis de decretos y leyes
                                             </li>
-                                            <li className="flex items-center gap-3 text-slate-700 font-medium">
+                                            <li className="flex items-center gap-3 text-foreground/80 font-medium">
                                                 <div className="bg-primary/20 p-1 rounded-full"><span className="material-symbols-outlined text-primary text-sm block">check</span></div>
                                                 Protección de autonomía jurídica
                                             </li>
@@ -140,7 +139,7 @@ export default function LandingPage() {
                         </div>
 
                         <div className="flex-1 w-full">
-                            <div className="aspect-square rounded-[3rem] p-4 bg-white/40 backdrop-blur-xl border border-white/60 shadow-2xl relative">
+                            <div className="aspect-square rounded-[3rem] p-4 bg-card border border-border shadow-md relative">
                                 <div className="w-full h-full rounded-[2.5rem] overflow-hidden relative">
                                     <img
                                         alt="Laboratorio tecnológico en el Cauca"
@@ -155,31 +154,31 @@ export default function LandingPage() {
                 </section>
 
                 {/* Impacto en el Territorio */}
-                <section className="px-6 lg:px-20 py-24 bg-slate-900 text-white relative overflow-hidden" id="impacto">
-                    <div className="absolute inset-0 bg-primary/20 backdrop-blur-3xl"></div>
+                <section className="px-6 lg:px-20 py-24 bg-primary text-primary-foreground relative overflow-hidden" id="impacto">
+                    <div className="absolute inset-0 bg-background/5 backdrop-blur-3xl"></div>
 
                     <div className="max-w-7xl mx-auto relative z-10">
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 text-center">
-                            <div className="flex flex-col items-center gap-4 p-8 rounded-3xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-2xl hover:bg-white/10 transition-colors">
+                            <div className="flex flex-col items-center gap-4 p-8 rounded-3xl bg-background/10 backdrop-blur-lg border border-background/20 shadow-lg transition-colors">
                                 <div className="h-20 flex items-center">
-                                    <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-white/50">100%</span>
+                                    <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-background to-background/50">100%</span>
                                 </div>
                                 <h4 className="text-xl font-bold">Gestión Comunitaria</h4>
-                                <p className="text-white/60">Procesos administrativos digitalizados bajo mando del Cabildo.</p>
+                                <p className="text-primary-foreground/80">Procesos administrativos digitalizados bajo mando del Cabildo.</p>
                             </div>
-                            <div className="flex flex-col items-center gap-4 p-8 rounded-3xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-2xl hover:bg-white/10 transition-colors">
+                            <div className="flex flex-col items-center gap-4 p-8 rounded-3xl bg-background/10 backdrop-blur-lg border border-background/20 shadow-lg transition-colors">
                                 <div className="h-20 flex items-center">
-                                    <span className="material-symbols-outlined text-7xl text-primary-foreground drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">security</span>
+                                    <span className="material-symbols-outlined text-7xl text-background drop-shadow-sm">security</span>
                                 </div>
                                 <h4 className="text-xl font-bold">Protección del Derecho Mayor</h4>
-                                <p className="text-white/60">Salvaguarda de las normas tradicionales y la autonomía política.</p>
+                                <p className="text-primary-foreground/80">Salvaguarda de las normas tradicionales y la autonomía política.</p>
                             </div>
-                            <div className="flex flex-col items-center gap-4 p-8 rounded-3xl bg-white/5 backdrop-blur-lg border border-white/10 shadow-2xl hover:bg-white/10 transition-colors">
+                            <div className="flex flex-col items-center gap-4 p-8 rounded-3xl bg-background/10 backdrop-blur-lg border border-background/20 shadow-lg transition-colors">
                                 <div className="h-20 flex items-center">
-                                    <span className="material-symbols-outlined text-7xl text-primary-foreground drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]">database</span>
+                                    <span className="material-symbols-outlined text-7xl text-background drop-shadow-sm">database</span>
                                 </div>
                                 <h4 className="text-xl font-bold">Soberanía de Datos</h4>
-                                <p className="text-white/60">Total control sobre la información sensible del territorio.</p>
+                                <p className="text-primary-foreground/80">Total control sobre la información sensible del territorio.</p>
                             </div>
                         </div>
                     </div>
@@ -189,8 +188,8 @@ export default function LandingPage() {
                 <section className="px-6 lg:px-20 py-24 relative" id="acceso">
                     <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
                         <div className="flex-1 order-2 lg:order-1 relative">
-                            {/* Glassmorphism Grid */}
-                            <div className="absolute inset-0 bg-secondary/20 blur-3xl rounded-full"></div>
+                            {/* Accent Glow */}
+                            <div className="absolute inset-0 bg-primary/10 blur-3xl rounded-full"></div>
                             <div className="grid grid-cols-2 gap-6 relative z-10">
                                 {[
                                     { icon: 'shield_person', title: 'Cabildo' },
@@ -198,19 +197,19 @@ export default function LandingPage() {
                                     { icon: 'person', title: 'Comunero' },
                                     { icon: 'account_balance', title: 'Autoridad' },
                                 ].map((role, i) => (
-                                    <div key={i} className="bg-white/60 backdrop-blur-xl p-8 rounded-3xl border border-white/60 shadow-xl flex flex-col items-center text-center hover:-translate-y-2 hover:shadow-2xl transition-all duration-300">
-                                        <div className="bg-primary/10 p-4 rounded-full mb-4">
+                                    <div key={i} className="bg-card p-8 rounded-3xl border border-border shadow-sm flex flex-col items-center text-center hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+                                        <div className="bg-primary/10 p-4 rounded-full mb-4 border border-primary/20">
                                             <span className="material-symbols-outlined text-primary text-3xl block">{role.icon}</span>
                                         </div>
-                                        <span className="font-bold text-slate-900 text-lg">{role.title}</span>
+                                        <span className="font-bold text-foreground text-lg">{role.title}</span>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
                         <div className="flex-1 order-1 lg:order-2">
-                            <h2 className="text-slate-900 text-4xl lg:text-5xl font-black mb-6 leading-tight">Acceso Seguro y Jerárquico</h2>
-                            <p className="text-slate-600 text-lg leading-relaxed mb-8">
+                            <h2 className="text-foreground text-4xl lg:text-5xl font-black mb-6 leading-tight">Acceso Seguro y Jerárquico</h2>
+                            <p className="text-muted-foreground text-lg leading-relaxed mb-8">
                                 Nuestra plataforma replica la estructura de autoridad tradicional. Cada rol tiene accesos específicos definidos por la asamblea comunitaria.
                             </p>
                             <Link href="/login" className="inline-flex items-center gap-3 bg-primary/10 px-6 py-3 rounded-xl text-primary font-bold text-lg hover:bg-primary hover:text-white transition-all duration-300 group">
@@ -223,26 +222,26 @@ export default function LandingPage() {
             </main>
 
             {/* Footer */}
-            <footer className="bg-slate-950 text-slate-400 px-6 lg:px-20 py-16 relative z-10">
+            <footer className="bg-secondary text-muted-foreground px-6 lg:px-20 py-16 relative z-10 border-t border-border">
                 <div className="max-w-7xl mx-auto">
-                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10 border-b border-white/10 pb-12 mb-12">
+                    <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-10 border-b border-border pb-12 mb-12">
                         <div className="flex flex-col gap-4">
-                            <div className="flex items-center gap-3 text-white">
-                                <span className="material-symbols-outlined text-3xl">landscape</span>
+                            <div className="flex items-center gap-3 text-foreground">
+                                <span className="material-symbols-outlined text-3xl text-primary">landscape</span>
                                 <h2 className="text-2xl font-black tracking-tight">Wala Kiwe</h2>
                             </div>
-                            <p className="max-w-xs text-sm leading-relaxed">Software para el fortalecimiento del Gobierno Propio y la Soberanía Digital en el Cauca.</p>
+                            <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">Software para el fortalecimiento del Gobierno Propio y la Soberanía Digital en el Cauca.</p>
                         </div>
                         <div className="flex flex-wrap gap-8 font-medium">
-                            <a className="hover:text-white transition-colors" href="#">Términos</a>
-                            <a className="hover:text-white transition-colors" href="#">Privacidad</a>
-                            <a className="hover:text-white transition-colors" href="#">Soporte Técnico</a>
+                            <a className="hover:text-foreground transition-colors" href="#">Términos</a>
+                            <a className="hover:text-foreground transition-colors" href="#">Privacidad</a>
+                            <a className="hover:text-foreground transition-colors" href="#">Soporte Técnico</a>
                         </div>
                     </div>
 
                     <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
                         <div className="flex items-center gap-4">
-                            <div className="bg-white p-2 rounded-xl backdrop-blur-md">
+                            <div className="bg-background border border-border p-2 rounded-xl">
                                 <Image
                                     width={40} height={40}
                                     alt="Logo ACIN"
@@ -250,9 +249,9 @@ export default function LandingPage() {
                                     unoptimized
                                 />
                             </div>
-                            <p className="text-sm font-medium">Asociación de Cabildos Indígenas del Norte del Cauca (ACIN)</p>
+                            <p className="text-sm font-medium text-muted-foreground">Asociación de Cabildos Indígenas del Norte del Cauca (ACIN)</p>
                         </div>
-                        <p className="text-sm">© {new Date().getFullYear()} Wala Kiwe. Hecho con respeto por la tradición.</p>
+                        <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Wala Kiwe. Hecho con respeto por la tradición.</p>
                     </div>
                 </div>
             </footer>

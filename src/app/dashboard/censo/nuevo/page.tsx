@@ -174,312 +174,303 @@ export default function NuevoComuneroPage() {
     return (
         <div className="flex-1 flex flex-col min-h-0 bg-transparent">
             <main className="flex-1 p-6 lg:p-10 overflow-y-auto custom-scrollbar">
-                {/* Breadcrumbs */}
-                <div className="flex items-center gap-3 text-white/40 text-[10px] font-black uppercase tracking-[0.2em] mb-8">
-                    <Link href="/dashboard" className="hover:text-primary-300 transition-colors">Censo</Link>
-                    <ChevronRight className="w-3 h-3" />
-                    <span className="text-white">Registrar Nuevo Comunero</span>
+                {/* Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                    <div>
+                        <h1 className="text-3xl font-black text-foreground tracking-tight">Registro de Comunero</h1>
+                        <p className="text-muted-foreground mt-1">Sincronización profesional con el Sistema de Registro Indígena.</p>
+                    </div>
                 </div>
 
-                <div className="max-w-5xl mx-auto">
-                    {/* Header */}
-                    <div className="flex items-center gap-6 mb-12">
-                        <div className="bg-primary/20 p-4 rounded-[2rem] border border-primary/30 shadow-[0_0_20px_rgba(var(--primary)/10)]">
-                            <UserPlus className="w-8 h-8 text-primary-300" />
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                    {/* Left Column: Photo and Profile Summary */}
+                    <div className="lg:col-span-1 space-y-6">
+                        <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+                            <div className="bg-pastel-blue px-4 py-3 flex items-center gap-2">
+                                <UserPlus className="w-5 h-5 text-primary" />
+                                <span className="text-sm font-bold text-primary uppercase tracking-wider">Perfil Digital</span>
+                            </div>
+                            <div className="p-6 flex flex-col items-center">
+                                <div className="relative group">
+                                    <input type="file" ref={fotoInputRef} onChange={handleFotoChange} accept="image/*" className="hidden" />
+                                    <div 
+                                        onClick={() => fotoInputRef.current?.click()}
+                                        className="w-40 h-40 rounded-full bg-secondary border-4 border-card shadow-lg overflow-hidden flex items-center justify-center cursor-pointer group-hover:border-primary/40 transition-all"
+                                    >
+                                        {fotoPreview ? (
+                                            <img src={fotoPreview} alt="Preview" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <Camera className="w-12 h-12 text-muted-foreground" />
+                                        )}
+                                    </div>
+                                    <button 
+                                        type="button"
+                                        onClick={() => fotoInputRef.current?.click()}
+                                        className="absolute bottom-1 right-1 bg-primary text-primary-foreground p-2 rounded-full shadow-lg hover:scale-110 transition-transform"
+                                    >
+                                        <Camera className="w-4 h-4" />
+                                    </button>
+                                </div>
+                                <h3 className="mt-6 text-lg font-bold text-foreground">Nueva Identidad</h3>
+                                <p className="text-xs text-muted-foreground text-center mt-2 px-4">Cargue una foto clara para el reconocimiento y carnetización.</p>
+                                <button 
+                                    type="button" 
+                                    onClick={() => fotoInputRef.current?.click()}
+                                    className="mt-6 w-full py-2.5 px-4 bg-secondary text-secondary-foreground rounded-lg text-sm font-bold hover:bg-muted transition-colors"
+                                >
+                                    Subir Foto
+                                </button>
+                            </div>
                         </div>
-                        <div>
-                            <h2 className="text-3xl font-black text-white tracking-tight">Registro de Comunero</h2>
-                            <p className="text-white/40 font-bold text-xs uppercase tracking-widest mt-1">Formulario de Vinculación al Censo Territorial</p>
+                        <div className="bg-card rounded-xl shadow-sm border border-border p-4">
+                            <div className="flex items-center gap-3 text-muted-foreground">
+                                <AlertCircle className="w-5 h-5 text-emerald-500 shrink-0" />
+                                <p className="text-xs italic leading-relaxed">Asegúrese de que todos los datos coincidan con su documento de identidad original.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <form className="space-y-10" onSubmit={handleSubmit}>
-                        {/* 1. Información Personal */}
-                        <section className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 lg:p-10 shadow-2xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[100px] -mr-32 -mt-32"></div>
-
-                            <div className="flex items-center gap-3 mb-8 relative z-10">
-                                <div className="bg-white/5 p-2 rounded-xl border border-white/10">
-                                    <Type className="w-4 h-4 text-primary-300" />
+                    {/* Right Column: The Form */}
+                    <div className="lg:col-span-2 space-y-6">
+                        <form className="space-y-6" onSubmit={handleSubmit}>
+                            {/* 1. Información Personal */}
+                            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+                                <div className="bg-pastel-green px-6 py-3 flex items-center gap-2">
+                                    <Type className="w-5 h-5 text-emerald-600" />
+                                    <span className="text-sm font-bold text-emerald-700 uppercase tracking-wider">Datos Personales</span>
                                 </div>
-                                <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Información de Identidad</h3>
-                            </div>
+                                <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <InputGroup label="Primer Nombre" required>
+                                        <input type="text" className="form-input text-foreground h-11" placeholder="Ej: Feliciano" value={formData.primerNombre} onChange={e => setFormData({ ...formData, primerNombre: e.target.value })} />
+                                    </InputGroup>
+                                    <InputGroup label="Segundo Nombre">
+                                        <input type="text" className="form-input text-foreground h-11" placeholder="Opcional" value={formData.segundoNombre} onChange={e => setFormData({ ...formData, segundoNombre: e.target.value })} />
+                                    </InputGroup>
+                                    <InputGroup label="Primer Apellido" required>
+                                        <input type="text" className="form-input text-foreground h-11" placeholder="Ej: Valencia" value={formData.primerApellido} onChange={e => setFormData({ ...formData, primerApellido: e.target.value })} />
+                                    </InputGroup>
+                                    <InputGroup label="Segundo Apellido" required>
+                                        <input type="text" className="form-input text-foreground h-11" placeholder="Ej: Tunubalá" value={formData.segundoApellido} onChange={e => setFormData({ ...formData, segundoApellido: e.target.value })} />
+                                    </InputGroup>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-                                <InputGroup label="Primer Nombre" required>
-                                    <input type="text" className="form-input" placeholder="Ej: Feliciano" value={formData.primerNombre} onChange={e => setFormData({ ...formData, primerNombre: e.target.value })} />
-                                </InputGroup>
-                                <InputGroup label="Segundo Nombre">
-                                    <input type="text" className="form-input" placeholder="Opcional" value={formData.segundoNombre} onChange={e => setFormData({ ...formData, segundoNombre: e.target.value })} />
-                                </InputGroup>
-                                <InputGroup label="Primer Apellido" required>
-                                    <input type="text" className="form-input" placeholder="Ej: Valencia" value={formData.primerApellido} onChange={e => setFormData({ ...formData, primerApellido: e.target.value })} />
-                                </InputGroup>
-                                <InputGroup label="Segundo Apellido" required>
-                                    <input type="text" className="form-input" placeholder="Ej: Tunubalá" value={formData.segundoApellido} onChange={e => setFormData({ ...formData, segundoApellido: e.target.value })} />
-                                </InputGroup>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 relative z-10">
-                                <InputGroup label="Tipo Documento" required>
-                                    <select className="form-input" value={formData.tipoDocumento} onChange={e => setFormData({ ...formData, tipoDocumento: e.target.value })}>
-                                        <option value="CC" className="bg-slate-900">Cédula de Ciudadanía</option>
-                                        <option value="TI" className="bg-slate-900">Tarjeta de Identidad</option>
-                                        <option value="RC" className="bg-slate-900">Registro Civil</option>
-                                    </select>
-                                </InputGroup>
-                                <InputGroup label="Número de Documento" required>
-                                    <div className="relative">
-                                        <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                                        <input type="text" className="form-input pl-10" placeholder="1023XXX" value={formData.numeroDocumento} onChange={e => setFormData({ ...formData, numeroDocumento: e.target.value })} />
-                                    </div>
-                                </InputGroup>
-                                <InputGroup label="Fecha de Nacimiento" required>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                                        <input type="date" className="form-input pl-10" value={formData.fechaNacimiento} onChange={e => setFormData({ ...formData, fechaNacimiento: e.target.value })} />
-                                    </div>
-                                </InputGroup>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 relative z-10">
-                                <InputGroup label="Género">
-                                    <div className="flex gap-2 p-1 bg-black/20 rounded-xl border border-white/5">
-                                        {['M', 'F', 'Otro'].map(g => (
-                                            <button key={g} type="button" onClick={() => setFormData({ ...formData, genero: g })} className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg transition-all ${formData.genero === g ? 'bg-primary text-white shadow-lg' : 'text-white/30 hover:text-white'}`}>{g}</button>
-                                        ))}
-                                    </div>
-                                </InputGroup>
-                                {!esMenor && (
-                                    <InputGroup label="Estado Civil">
-                                        <select className="form-input" value={formData.estadoCivil} onChange={e => setFormData({ ...formData, estadoCivil: e.target.value })}>
-                                            <option className="bg-slate-900">Soltero/a</option>
-                                            <option className="bg-slate-900">Casado/a</option>
-                                            <option className="bg-slate-900">Unión Libre</option>
-                                            <option className="bg-slate-900">Viudo/a</option>
+                                    <InputGroup label="Tipo Documento" required>
+                                        <select className="form-input text-foreground h-11" value={formData.tipoDocumento} onChange={e => setFormData({ ...formData, tipoDocumento: e.target.value })}>
+                                            <option value="CC" className="bg-background">Cédula de Ciudadanía</option>
+                                            <option value="TI" className="bg-background">Tarjeta de Identidad</option>
+                                            <option value="RC" className="bg-background">Registro Civil</option>
                                         </select>
                                     </InputGroup>
-                                )}
-                                <InputGroup label="Dirección Actual">
-                                    <div className="relative">
-                                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                                        <input type="text" className="form-input pl-10" placeholder="Vereda X, Sector Y" value={formData.direccion} onChange={e => setFormData({ ...formData, direccion: e.target.value })} />
+                                    <InputGroup label="Número de Documento" required>
+                                        <div className="relative">
+                                            <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                            <input type="text" className="form-input pl-10 text-foreground h-11" placeholder="1023XXX" value={formData.numeroDocumento} onChange={e => setFormData({ ...formData, numeroDocumento: e.target.value })} />
+                                        </div>
+                                    </InputGroup>
+
+                                    <InputGroup label="Fecha de Nacimiento" required>
+                                        <div className="relative">
+                                            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                            <input type="date" className="form-input pl-10 text-foreground h-11" value={formData.fechaNacimiento} onChange={e => setFormData({ ...formData, fechaNacimiento: e.target.value })} />
+                                        </div>
+                                    </InputGroup>
+                                    
+                                    <InputGroup label="Dirección Actual">
+                                        <div className="relative">
+                                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                            <input type="text" className="form-input pl-10 text-foreground h-11" placeholder="Vereda X, Sector Y" value={formData.direccion} onChange={e => setFormData({ ...formData, direccion: e.target.value })} />
+                                        </div>
+                                    </InputGroup>
+
+                                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <InputGroup label="Género">
+                                        <div className="flex gap-2 p-1 bg-secondary rounded-xl border border-border h-11">
+                                            {['M', 'F', 'Otro'].map(g => (
+                                                <button key={g} type="button" onClick={() => setFormData({ ...formData, genero: g })} className={`flex-1 text-[10px] font-black uppercase rounded-lg transition-all ${formData.genero === g ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>{g}</button>
+                                            ))}
+                                        </div>
+                                    </InputGroup>
+                                    {!esMenor && (
+                                        <InputGroup label="Estado Civil">
+                                            <select className="form-input text-foreground h-11" value={formData.estadoCivil} onChange={e => setFormData({ ...formData, estadoCivil: e.target.value })}>
+                                                <option className="bg-background">Soltero/a</option>
+                                                <option className="bg-background">Casado/a</option>
+                                                <option className="bg-background">Unión Libre</option>
+                                                <option className="bg-background">Viudo/a</option>
+                                            </select>
+                                        </InputGroup>
+                                    )}
                                     </div>
-                                </InputGroup>
+                                </div>
                             </div>
-                        </section>
 
                         {/* 2. Formación y Ocupación */}
-                        <section className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 lg:p-10 shadow-2xl relative overflow-hidden">
-                            <div className="flex items-center gap-3 mb-8">
-                                <div className="bg-white/5 p-2 rounded-xl border border-white/10">
-                                    <GraduationCap className="w-4 h-4 text-primary-300" />
+                            {/* 2. Formación y Ocupación */}
+                            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+                                <div className="bg-pastel-amber px-6 py-3 flex items-center gap-2">
+                                    <GraduationCap className="w-5 h-5 text-amber-600" />
+                                    <span className="text-sm font-bold text-amber-700 uppercase tracking-wider">Formación y Ocupación</span>
                                 </div>
-                                <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Formación y Ocupación</h3>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <InputGroup label="Nivel de Escolaridad Actual">
-                                    <select className="form-input" value={formData.nivelEscolaridad} onChange={e => setFormData({ ...formData, nivelEscolaridad: e.target.value })}>
-                                        <option className="bg-slate-900">Sin escolaridad</option>
-                                        <option className="bg-slate-900">Preescolar</option>
-                                        <option className="bg-slate-900">Primaria</option>
-                                        <option className="bg-slate-900">Secundaria</option>
-                                        <option className="bg-slate-900">Técnico/Tecnólogo</option>
-                                        <option className="bg-slate-900">Universitario</option>
-                                    </select>
-                                </InputGroup>
-
-                                <InputGroup label="Ocupación Principal">
-                                    <div className="flex gap-2">
-                                        <select className="form-input flex-1" value={formData.ocupacion} onChange={e => setFormData({ ...formData, ocupacion: e.target.value })}>
-                                            {opcionesOcupacion.map(opt => <option key={opt} className="bg-slate-900">{opt}</option>)}
+                                <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <InputGroup label="Nivel de Escolaridad Actual">
+                                        <select className="form-input text-foreground h-11" value={formData.nivelEscolaridad} onChange={e => setFormData({ ...formData, nivelEscolaridad: e.target.value })}>
+                                            <option className="bg-background">Sin escolaridad</option>
+                                            <option className="bg-background">Preescolar</option>
+                                            <option className="bg-background">Primaria</option>
+                                            <option className="bg-background">Secundaria</option>
+                                            <option className="bg-background">Técnico/Tecnólogo</option>
+                                            <option className="bg-background">Universitario</option>
                                         </select>
-                                        <button type="button" onClick={() => setShowNuevaOcupacion(!showNuevaOcupacion)} className="bg-white/5 border border-white/10 p-3 rounded-xl hover:bg-white/10 text-primary-300 transition-all">
-                                            <Plus className="w-5 h-5" />
-                                        </button>
-                                    </div>
-                                    {showNuevaOcupacion && (
-                                        <div className="mt-3 flex gap-2 animate-in slide-in-from-top-2 duration-300">
-                                            <input type="text" className="form-input flex-1 bg-primary/5 border-primary/20" placeholder="Nueva ocupación..." value={nuevaOcupacion} onChange={e => setNuevaOcupacion(e.target.value)} />
-                                            <button type="button" onClick={handleAddOcupacion} className="bg-primary px-4 rounded-xl text-white font-black text-[10px] uppercase">Agregar</button>
+                                    </InputGroup>
+
+                                    <InputGroup label="Ocupación Principal">
+                                        <div className="flex gap-2">
+                                            <select className="form-input flex-1 text-foreground h-11" value={formData.ocupacion} onChange={e => setFormData({ ...formData, ocupacion: e.target.value })}>
+                                                {opcionesOcupacion.map(opt => <option key={opt} className="bg-background">{opt}</option>)}
+                                            </select>
+                                            <button type="button" onClick={() => setShowNuevaOcupacion(!showNuevaOcupacion)} className="bg-secondary border border-border p-3 rounded-lg hover:bg-muted text-primary transition-all">
+                                                <Plus className="w-5 h-5" />
+                                            </button>
                                         </div>
-                                    )}
-                                </InputGroup>
+                                        {showNuevaOcupacion && (
+                                            <div className="mt-3 flex gap-2 animate-in slide-in-from-top-2 duration-300">
+                                                <input type="text" className="form-input flex-1 h-11 text-foreground" placeholder="Nueva ocupación..." value={nuevaOcupacion} onChange={e => setNuevaOcupacion(e.target.value)} />
+                                                <button type="button" onClick={handleAddOcupacion} className="bg-primary px-4 rounded-lg text-primary-foreground font-black text-[10px] uppercase">Agregar</button>
+                                            </div>
+                                        )}
+                                    </InputGroup>
+                                </div>
                             </div>
-                        </section>
 
                         {/* 3. Salud y Cultural */}
-                        <section className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 lg:p-10 shadow-2xl relative overflow-hidden">
-                            <div className="flex items-center gap-3 mb-8">
-                                <div className="bg-white/5 p-2 rounded-xl border border-white/10">
-                                    <HeartPulse className="w-4 h-4 text-primary-300" />
+                            {/* 3. Salud y Cultural */}
+                            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+                                <div className="bg-pastel-purple px-6 py-3 flex items-center gap-2">
+                                    <HeartPulse className="w-5 h-5 text-purple-600" />
+                                    <span className="text-sm font-bold text-purple-700 uppercase tracking-wider">Identidad, Salud y Territorio</span>
                                 </div>
-                                <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Salud y Cultura</h3>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                <InputGroup label="Régimen de Salud">
-                                    <select className="form-input" value={formData.regimenSalud} onChange={e => setFormData({ ...formData, regimenSalud: e.target.value })}>
-                                        <option className="bg-slate-900">Subsidiado</option>
-                                        <option className="bg-slate-900">Contributivo</option>
-                                        <option className="bg-slate-900">Otro</option>
-                                    </select>
-                                </InputGroup>
-                                <InputGroup label="EPS">
-                                    <input type="text" className="form-input" placeholder="Nombre EPS" value={formData.eps} onChange={e => setFormData({ ...formData, eps: e.target.value })} />
-                                </InputGroup>
-                                <InputGroup label="Uso de Nasayuwe">
-                                    <div className="relative">
-                                        <Languages className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                                        <select className="form-input pl-10" value={formData.hablaNasayuwe} onChange={e => setFormData({ ...formData, hablaNasayuwe: e.target.value })}>
-                                            <option className="bg-slate-900">Lo habla fluidamente</option>
-                                            <option className="bg-slate-900">Lo habla poco</option>
-                                            <option className="bg-slate-900">Lo entiende pero no habla</option>
-                                            <option className="bg-slate-900">No habla ni entiende</option>
-                                        </select>
-                                    </div>
-                                </InputGroup>
-                            </div>
-
-                            <div className="mt-10 p-6 bg-white/5 rounded-3xl border border-white/5">
-                                <div className="flex items-center justify-between mb-6">
-                                    <div className="flex items-center gap-3">
-                                        <Accessibility className="w-5 h-5 text-primary-300" />
-                                        <span className="text-xs font-black text-white uppercase tracking-widest">¿Tiene alguna discapacidad?</span>
-                                    </div>
-                                    <input type="checkbox" checked={formData.tieneDiscapacidad} onChange={e => setFormData({ ...formData, tieneDiscapacidad: e.target.checked })} className="w-6 h-6 rounded-lg bg-black/20 border-white/10 text-primary focus:ring-primary/40" />
-                                </div>
-
-                                {formData.tieneDiscapacidad && (
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 animate-in fade-in duration-500">
-                                        {opcionesDiscapacidad.map(opt => (
-                                            <button
-                                                key={opt} type="button"
-                                                onClick={() => handleDiscapacidadToggle(opt)}
-                                                className={`py-3 px-4 rounded-xl text-[10px] font-bold border transition-all flex items-center justify-between ${formData.discapacidades.includes(opt) ? 'bg-primary/20 border-primary/40 text-white' : 'bg-black/20 border-white/5 text-white/30 hover:border-white/20'}`}
-                                            >
-                                                {opt}
-                                                {formData.discapacidades.includes(opt) && <Check className="w-3 h-3 text-primary-300" />}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="mt-8 flex items-center justify-between p-6 bg-primary/5 rounded-3xl border border-primary/10">
-                                <div className="flex items-center gap-3">
-                                    <ShieldCheck className="w-6 h-6 text-primary-300" />
-                                    <div className="flex flex-col">
-                                        <span className="text-white font-bold text-sm">¿Ha sido autoridad del Cabildo?</span>
-                                        <span className="text-[10px] text-white/30 font-bold uppercase tracking-widest">Gobernador, Alguacil, etc.</span>
-                                    </div>
-                                </div>
-                                <input type="checkbox" checked={formData.haSidoAutoridad} onChange={e => setFormData({ ...formData, haSidoAutoridad: e.target.checked })} className="w-10 h-6 rounded-full bg-black/40 border-white/10 text-primary focus:ring-offset-0" />
-                            </div>
-
-                            <div className="mt-4 p-6 bg-primary/5 rounded-3xl border border-primary/10">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center gap-3">
-                                        <ShieldCheck className="w-6 h-6 text-primary-300" />
-                                        <div className="flex flex-col">
-                                            <span className="text-white font-bold text-sm">¿Es autoridad actualmente?</span>
-                                        </div>
-                                    </div>
-                                    <input type="checkbox" checked={formData.esAutoridadActualmente} onChange={e => setFormData({ ...formData, esAutoridadActualmente: e.target.checked })} className="w-10 h-6 rounded-full bg-black/40 border-white/10 text-primary focus:ring-offset-0" />
-                                </div>
-                                {formData.esAutoridadActualmente && (
-                                    <div className="animate-in slide-in-from-top-2 duration-300">
-                                        <InputGroup label="Cargo Actual" required>
-                                            <input type="text" className="form-input" placeholder="Ej: Gobernador, Alguacil Mayor" value={formData.cargoAutoridad} onChange={e => setFormData({ ...formData, cargoAutoridad: e.target.value })} />
+                                <div className="p-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                        <InputGroup label="Régimen de Salud">
+                                            <select className="form-input text-foreground h-11" value={formData.regimenSalud} onChange={e => setFormData({ ...formData, regimenSalud: e.target.value })}>
+                                                <option className="bg-background">Subsidiado</option>
+                                                <option className="bg-background">Contributivo</option>
+                                                <option className="bg-background">Otro</option>
+                                            </select>
+                                        </InputGroup>
+                                        <InputGroup label="EPS">
+                                            <input type="text" className="form-input text-foreground h-11" placeholder="Nombre EPS" value={formData.eps} onChange={e => setFormData({ ...formData, eps: e.target.value })} />
+                                        </InputGroup>
+                                        <InputGroup label="Uso de Nasayuwe">
+                                            <div className="relative">
+                                                <Languages className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                                <select className="form-input pl-10 text-foreground h-11" value={formData.hablaNasayuwe} onChange={e => setFormData({ ...formData, hablaNasayuwe: e.target.value })}>
+                                                    <option className="bg-background">Lo habla fluidamente</option>
+                                                    <option className="bg-background">Lo habla poco</option>
+                                                    <option className="bg-background">Lo entiende pero no habla</option>
+                                                    <option className="bg-background">No habla ni entiende</option>
+                                                </select>
+                                            </div>
                                         </InputGroup>
                                     </div>
-                                )}
-                            </div>
-                        </section>
 
-                        {/* 4. Archivos y Documentación */}
-                        <section className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 lg:p-10 shadow-2xl relative overflow-hidden">
-                            <div className="flex items-center gap-3 mb-8">
-                                <div className="bg-white/5 p-2 rounded-xl border border-white/10">
-                                    <Upload className="w-4 h-4 text-primary-300" />
-                                </div>
-                                <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Archivos y Documentación</h3>
-                            </div>
+                                    <div className="mt-8 pt-6 border-t border-border">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <label className="text-sm font-semibold text-foreground">¿Tiene alguna discapacidad?</label>
+                                            <input type="checkbox" checked={formData.tieneDiscapacidad} onChange={e => setFormData({ ...formData, tieneDiscapacidad: e.target.checked })} className="w-5 h-5 rounded bg-secondary border-border text-primary focus:ring-primary" />
+                                        </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                <div className="space-y-4">
-                                    <p className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Foto de Perfil</p>
-                                    <input type="file" ref={fotoInputRef} onChange={handleFotoChange} accept="image/*" className="hidden" />
-                                    <div
-                                        onClick={() => fotoInputRef.current?.click()}
-                                        className="w-full h-48 rounded-[2rem] border-2 border-dashed border-white/10 bg-black/20 flex flex-col items-center justify-center group hover:border-primary/40 transition-all cursor-pointer relative overflow-hidden"
-                                    >
-                                        {fotoPreview ? (
-                                            <>
-                                                <img src={fotoPreview} alt="Preview" className="w-full h-full object-cover" />
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                    <Camera className="w-8 h-8 text-white" />
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <div className="bg-primary/10 p-4 rounded-full mb-3 group-hover:scale-110 transition-transform">
-                                                    <Camera className="w-8 h-8 text-primary-300" />
-                                                </div>
-                                                <p className="text-xs font-bold text-white/40">Capturar o Subir Foto</p>
-                                            </>
+                                        {formData.tieneDiscapacidad && (
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                                {opcionesDiscapacidad.map(opt => (
+                                                    <label key={opt} className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors group ${formData.discapacidades.includes(opt) ? 'bg-primary/10 border-primary/30' : 'border-border hover:bg-secondary'}`}>
+                                                        <input type="checkbox" checked={formData.discapacidades.includes(opt)} onChange={() => handleDiscapacidadToggle(opt)} className="text-primary focus:ring-primary rounded" />
+                                                        <span className="text-sm font-medium text-foreground">{opt}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="mt-8 pt-6 border-t border-border space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex flex-col">
+                                                <span className="text-foreground font-semibold text-sm">¿Ha sido autoridad del Cabildo?</span>
+                                                <span className="text-xs text-muted-foreground">Ej: Gobernador, Alguacil Mayor</span>
+                                            </div>
+                                            <input type="checkbox" checked={formData.haSidoAutoridad} onChange={e => setFormData({ ...formData, haSidoAutoridad: e.target.checked })} className="w-5 h-5 rounded bg-secondary border-border text-primary focus:ring-primary" />
+                                        </div>
+
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-foreground font-semibold text-sm">¿Es autoridad actualmente?</span>
+                                            <input type="checkbox" checked={formData.esAutoridadActualmente} onChange={e => setFormData({ ...formData, esAutoridadActualmente: e.target.checked })} className="w-5 h-5 rounded bg-secondary border-border text-primary focus:ring-primary" />
+                                        </div>
+                                        {formData.esAutoridadActualmente && (
+                                            <div className="mt-2 pl-4 border-l-2 border-primary/40 fade-in">
+                                                <InputGroup label="Cargo Actual" required>
+                                                    <input type="text" className="form-input text-foreground h-11" placeholder="Ej: Gobernador" value={formData.cargoAutoridad} onChange={e => setFormData({ ...formData, cargoAutoridad: e.target.value })} />
+                                                </InputGroup>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
+                            </div>
 
-                                <div className="space-y-4">
-                                    <p className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Documentos Personales (PDF, JPG)</p>
-                                    <input type="file" ref={docsInputRef} onChange={handleDocsChange} multiple className="hidden" />
-                                    <div className="space-y-3 max-h-48 overflow-y-auto custom-scrollbar pr-2">
-                                        {documentos.map((doc, idx) => (
-                                            <div key={idx} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 group">
-                                                <div className="flex items-center gap-3">
-                                                    <FileText className="w-4 h-4 text-primary-300" />
-                                                    <span className="text-[10px] font-bold text-white/60 truncate max-w-[150px]">{doc.name}</span>
+                            {/* 4. Archivos y Documentación */}
+                            <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+                                <div className="bg-muted px-6 py-3 flex items-center gap-2">
+                                    <Upload className="w-5 h-5 text-muted-foreground" />
+                                    <span className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Documentación Adjunta</span>
+                                </div>
+                                <div className="p-6">
+                                    <div className="space-y-4">
+                                        <p className="text-sm font-semibold text-foreground">Documentos Personales (PDF, JPG)</p>
+                                        <input type="file" ref={docsInputRef} onChange={handleDocsChange} multiple className="hidden" />
+                                        <div className="space-y-3 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+                                            {documentos.map((doc, idx) => (
+                                                <div key={idx} className="flex items-center justify-between p-3 bg-secondary rounded-xl border border-border group">
+                                                    <div className="flex items-center gap-3">
+                                                        <FileText className="w-4 h-4 text-primary" />
+                                                        <span className="text-xs font-medium text-foreground truncate max-w-[200px]">{doc.name}</span>
+                                                    </div>
+                                                    <button type="button" onClick={() => removeDoc(idx)} className="text-muted-foreground hover:text-destructive transition-colors">
+                                                        <X className="w-4 h-4" />
+                                                    </button>
                                                 </div>
-                                                <button type="button" onClick={() => removeDoc(idx)} className="text-white/20 hover:text-red-400 transition-colors">
-                                                    <X className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        ))}
+                                            ))}
 
-                                        <button
-                                            type="button"
-                                            onClick={() => docsInputRef.current?.click()}
-                                            className="w-full py-4 rounded-2xl border-2 border-dashed border-white/5 bg-white/5 text-white/20 text-xs font-bold hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2"
-                                        >
-                                            <Plus className="w-4 h-4" /> Agregar documentos
-                                        </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => docsInputRef.current?.click()}
+                                                className="w-full py-3 rounded-lg border border-dashed border-border bg-secondary/50 text-muted-foreground text-sm font-medium hover:bg-secondary hover:text-foreground transition-all flex items-center justify-center gap-2"
+                                            >
+                                                <Plus className="w-4 h-4" /> Agregar documentos
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-6 p-4 bg-pastel-amber/50 border border-amber-200 rounded-lg flex gap-3 text-amber-800 items-start">
+                                        <AlertCircle className="w-5 h-5 shrink-0" />
+                                        <p className="text-xs leading-relaxed">
+                                            La información personal está cifrada y protegida. Se auditan los accesos.
+                                        </p>
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="mt-10 p-5 bg-amber-500/5 border border-amber-500/10 rounded-2xl flex gap-4 items-start">
-                                <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                                <p className="text-[10px] text-amber-200/60 leading-relaxed font-bold uppercase tracking-wider">
-                                    Al guardar, se creará automáticamente la carpeta <span className="text-amber-400">"{formData.tipoDocumento}_{formData.numeroDocumento || 'NUMERO'}"</span> en el servidor para almacenar estos archivos de forma privada.
-                                </p>
+                            
+                            {/* Actions */}
+                            <div className="flex items-center justify-end gap-4 py-4">
+                                <button type="button" onClick={() => router.back()} disabled={isSubmitting} className="px-6 py-2.5 rounded-lg border border-border text-muted-foreground font-semibold hover:bg-secondary transition-all disabled:opacity-50">Cancelar</button>
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="px-8 py-2.5 rounded-lg bg-primary text-primary-foreground font-bold shadow-md shadow-primary/20 hover:opacity-90 transition-all flex items-center gap-2 disabled:opacity-50"
+                                >
+                                    <ShieldCheck className="w-5 h-5"/>
+                                    {isSubmitting ? 'Guardando...' : 'Guardar Registro'}
+                                </button>
                             </div>
-                        </section>
-
-                        {/* Actions */}
-                        <div className="flex justify-end gap-4 py-10">
-                            <button type="button" onClick={() => router.back()} disabled={isSubmitting} className="px-10 py-4 rounded-2xl border border-white/10 text-white/40 font-black text-sm uppercase tracking-[0.2em] hover:bg-white/5 transition-all disabled:opacity-50">Cancelar</button>
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="px-12 py-4 rounded-2xl bg-primary text-white font-black text-sm uppercase tracking-[0.2em] shadow-2xl shadow-primary/40 hover:scale-105 active:scale-95 transition-all border-b-4 border-primary/60 disabled:opacity-50 disabled:scale-100"
-                            >
-                                {isSubmitting ? 'Guardando...' : 'Guardar Comunero'}
-                            </button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </main>
         </div>
@@ -489,15 +480,15 @@ export default function NuevoComuneroPage() {
 // Subcomponents for cleaner UI
 function InputGroup({ label, required, children }: { label: string, required?: boolean, children: React.ReactNode }) {
     return (
-        <div className="flex flex-col gap-2.5">
-            <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-1 flex items-center gap-1">
+        <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-semibold text-foreground flex items-center gap-1">
                 {label}
-                {required && <span className="text-primary-500">*</span>}
+                {required && <span className="text-destructive">*</span>}
             </label>
             {children}
             <style jsx global>{`
         .form-input {
-          @apply w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all placeholder:text-white/10;
+          @apply w-full rounded-lg border-border bg-card focus:ring-primary focus:border-primary text-foreground border transition-colors outline-none px-3 py-2;
         }
       `}</style>
         </div>

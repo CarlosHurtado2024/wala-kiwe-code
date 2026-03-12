@@ -59,8 +59,11 @@ export async function askFloatingKomi(
 
     const supabase = await createClient();
     const key = process.env.GROQ_API_KEY?.trim();
+    console.log("DEBUG: GROQ_API_KEY status:", key ? "Present" : "Missing");
+    console.log("DEBUG: GROQ_API_KEY length:", key?.length || 0);
 
     if (!key) {
+        console.error("DEBUG: GROQ_API_KEY is missing from environment variables.");
         return { answer: "⚠️ El módulo de IA no está configurado (Falta GROQ_API_KEY).", tableData: null, error: true };
     }
 
@@ -72,6 +75,7 @@ export async function askFloatingKomi(
         }));
 
         // --- PASO 1: Generar SQL ---
+        console.log("DEBUG: Initiating Step 1 fetch to Groq...");
         const firstResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
             headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
@@ -86,6 +90,8 @@ export async function askFloatingKomi(
                 response_format: { type: "json_object" }
             })
         });
+
+        console.log("DEBUG: Step 1 fetch completed. Status:", firstResponse.status);
 
         if (!firstResponse.ok) {
             const err = await firstResponse.json();
@@ -107,6 +113,7 @@ export async function askFloatingKomi(
         let dbResults = null;
         let dbErrorMsg = null;
         if (aiAnalysis.sql_query) {
+            console.log("DEBUG: Executing SQL:", aiAnalysis.sql_query);
             const cleanSql = aiAnalysis.sql_query.replace(/;/g, '').trim();
             const { data: dbData, error: dbError } = await (supabase as any).rpc('execute_read_only_sql', { query_text: cleanSql });
             if (dbError) {
@@ -118,6 +125,7 @@ export async function askFloatingKomi(
         }
 
         // --- PASO 2: Generar respuesta amigable con datos reales ---
+        console.log("DEBUG: Initiating Step 2 fetch to Groq...");
         const finalResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
             headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
@@ -166,6 +174,8 @@ export async function askFloatingKomi(
         return finalOutput;
 
     } catch (e: any) {
+        console.error("DEBUG: AskFloatingKomi error caught:", e);
+        if (e.cause) console.error("DEBUG: Error cause:", e.cause);
         console.error("AskFloatingKomi error:", e);
         return { answer: `Ocurrió un error inesperado conectando con el asistente: ${e.message}`, tableData: null, error: true };
     }
