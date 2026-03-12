@@ -6,9 +6,9 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const DB_SCHEMA = `
 Tablas en la base de datos (PostgreSQL):
 
-1. familias (id, codigo_familia, nombre_cabeza_familia, vereda_comunidad)
+1. familias (id, codigo_familia, nombre_familia, vereda_comunidad, created_at)
 2. predios (id, nombre_predio, area_hectareas, linderos)
-3. comuneros (id, nombres, apellidos, documento_identidad, fecha_nacimiento, genero, estado_censo, familia_id, parentezco_cabeza, rol_autoridad, es_guardia_indigena)
+3. comuneros (id, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, tipo_documento, numero_documento, fecha_nacimiento, genero, direccion_actual, nivel_escolaridad, ocupacion, estado_civil, regimen_salud, eps, habla_nasayuwe, ha_sido_autoridad, es_autoridad_actualmente, cargo_autoridad, tiene_discapacidad, discapacidades, familia_id, parentezco_cabeza, created_at)
 4. adjudicaciones (id, comunero_id, predio_id, observaciones)
 5. expedientes_justicia (id, codigo_expediente, fecha_apertura, descripcion_hechos, estado, resolucion_final)
 6. comuneros_implicados (comunero_id, expediente_id, rol_implicado, estado_sancion, sancion_impuesta)
@@ -18,6 +18,7 @@ Tablas en la base de datos (PostgreSQL):
 
 RELACIONES Y CLAVES FORÁNEAS:
 - comuneros.familia_id -> familias.id
+- El jefe de familia se identifica cuando comuneros.parentezco_cabeza = 'Cabeza de familia'
 - adjudicaciones.comunero_id -> comuneros.id
 - adjudicaciones.predio_id -> predios.id
 - comuneros_implicados.comunero_id -> comuneros.id
@@ -25,12 +26,16 @@ RELACIONES Y CLAVES FORÁNEAS:
 - fichas_salud.comunero_id -> comuneros.id
 - transacciones_sgp.presupuesto_id -> presupuestos_sgp.id
 
+REGLAS DE NOMBRES:
+- Para obtener el nombre completo: primer_nombre || ' ' || primer_apellido (o incluyendo segundo_nombre y segundo_apellido si se necesitan).
+- Para buscar por nombre: primer_nombre ILIKE '%texto%' OR primer_apellido ILIKE '%texto%'.
+
 REGLAS DE GÉNERO Y EDAD:
 - La columna 'genero' contiene 'M' (masculino/hombres) o 'F' (femenino/mujeres).
 - La columna 'fecha_nacimiento' es de tipo date. Para calcular edades usa: EXTRACT(YEAR FROM age(fecha_nacimiento)).
 
 BÚSQUEDAS DE TEXTO Y LÍMITES:
-- Si vas a buscar por textos como nombres, veredas, o diagnósticos, SIEMPRE usa ILIKE para ignorar mayúsculas y minúsculas (ej: nombres ILIKE '%juan%').
+- Si vas a buscar por textos como nombres, veredas, o diagnósticos, SIEMPRE usa ILIKE para ignorar mayúsculas y minúsculas (ej: primer_nombre ILIKE '%juan%').
 - Para evitar sobrecargar la interfaz, si la consulta retorna múltiples filas y el usuario no especificó una cantidad, agrega un LIMIT 100.
 
 INSTRUCCIONES PARA EL ASISTENTE (PASO 1):

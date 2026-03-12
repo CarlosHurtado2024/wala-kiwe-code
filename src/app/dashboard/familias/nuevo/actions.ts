@@ -9,10 +9,10 @@ function logDebug(msg: string) {
         const logPath = path.join(process.cwd(), "debug-familia.log");
         fs.appendFileSync(logPath, new Date().toISOString() + " - " + msg + "\n");
         console.log("DEBUG-FAMILIA:", msg);
-    } catch(e) {}
+    } catch (e) { }
 }
 
-export async function createFamiliaAction(selectedMemberIds: string[], firstMemberName: string, vereda?: string) {
+export async function createFamiliaAction(selectedMemberIds: string[], firstMemberName: string, vereda?: string, jefeId?: string) {
     try {
         const supabase = await createClient();
 
@@ -20,9 +20,7 @@ export async function createFamiliaAction(selectedMemberIds: string[], firstMemb
         logDebug("Members: " + selectedMemberIds.join(", "));
 
         // 1. Generate a Code WK-XXXX
-        // We TRY to get the total count, but if RLS is on, this is unreliable.
-        // Let's try to find the maximum existing code or just use a random salt if it fails.
-        const { data: lastFamilies, error: countError } = await supabase
+        const { data: lastFamilies } = await supabase
             .from('familias')
             .select('codigo_familia')
             .order('codigo_familia', { ascending: false })
@@ -35,60 +33,66 @@ export async function createFamiliaAction(selectedMemberIds: string[], firstMemb
                 nextNumber = parseInt(matches[0]) + 1;
             }
         } else {
-            // If we find 0, maybe it's RLS. Let's try to count all to be sure if possible
             const { count } = await supabase.from('familias').select('*', { count: 'exact', head: true });
             nextNumber = (count || 0) + 1;
         }
-        
-        // Safety: If we keep failing with unique constraint, we'll need a different approach.
-        // For now, let's just try to insert.
+
         const padded = nextNumber.toString().padStart(4, '0');
         let newCode = `WK-${padded}`;
-        
+
         logDebug("Attempting with code: " + newCode);
 
         // 2. Create Familia record
-        // Important: If RLS allows insert but not select, .single() fails.
-        // We'll try to insert and if we can't select, we might have to use a different strategy.
-        const { data: nuevaFamilia, error: errorFamilia } = await supabase.from('familias').insert({
+        const { data: membersData } = await (supabase.from('comuneros') as any)
+            .select('primer_apellido')
+            .in('id', selectedMemberIds);
+
+        const surnames = Array.from(new Set((membersData || []).map((m: any) => m.primer_apellido).filter(Boolean))).slice(0, 2).join(' ');
+        const familyName = surnames ? `Familia ${surnames}` : firstMemberName;
+
+        const familiaPayload = {
             codigo_familia: newCode,
-            nombre_cabeza_familia: firstMemberName,
+            nombre_familia: familyName,
             vereda_comunidad: vereda || 'Vereda no reportada'
-        }).select(); // Removed .single() to see if we get an array
+        };
+
+        const { data: nuevaFamilia, error: errorFamilia } = await supabase
+            .from('familias')
+            .insert(familiaPayload)
+            .select();
 
         if (errorFamilia) {
             logDebug("Error inserting familia: " + JSON.stringify(errorFamilia));
-            // If it's a unique constraint violation, try with a random number as fallback for now to verify
             if (errorFamilia.code === '23505') {
-                 const randomCode = `WK-${Math.floor(Math.random() * 9000) + 1000}`;
-                 logDebug("Unique violation, retrying with random code: " + randomCode);
-                 const { data: retryData, error: retryError } = await supabase.from('familias').insert({
-                    codigo_familia: randomCode,
-                    nombre_cabeza_familia: firstMemberName,
-                    vereda_comunidad: vereda || 'Vereda no reportada'
+                const randomCode = `WK-${Math.floor(Math.random() * 9000) + 1000}`;
+                logDebug("Unique violation, retrying with random code: " + randomCode);
+                const { data: retryData, error: retryError } = await supabase.from('familias').insert({
+                    ...familiaPayload,
+                    codigo_familia: randomCode
                 }).select();
+
                 if (retryError) {
                     return { success: false, error: `Error DB Familia (Retry): ${retryError.message}` };
                 }
-                // Continue with retryData
+
                 if (retryData && retryData.length > 0) {
-                    processMembers(supabase, retryData[0].id, selectedMemberIds);
+                    await processMembers(supabase, retryData[0].id, selectedMemberIds, jefeId);
                     return { success: true, familiaId: retryData[0].id };
                 }
             }
-            return { success: false, error: `Error DB Familia: ${errorFamilia.message} (Code: ${errorFamilia.code})` };
+            return { success: false, error: `Error DB Familia: ${errorFamilia.message}` };
         }
 
         if (!nuevaFamilia || nuevaFamilia.length === 0) {
-            logDebug("Insert succeeded but returned no data (likely RLS policy)");
-            return { success: false, error: "La familia fue creada pero no se pudo recuperar el ID. Verifique permisos de SELECT en la tabla familias." };
+            logDebug("Insert succeeded but returned no data");
+            return { success: false, error: "La familia fue creada pero no se pudo recuperar el ID." };
         }
 
         const id = nuevaFamilia[0].id;
         logDebug("Created familia ID: " + id);
 
         // 3. Update all selected members
-        await processMembers(supabase, id, selectedMemberIds);
+        await processMembers(supabase, id, selectedMemberIds, jefeId);
 
         logDebug("Success!");
         return { success: true, familiaId: id };
@@ -98,12 +102,15 @@ export async function createFamiliaAction(selectedMemberIds: string[], firstMemb
     }
 }
 
-async function processMembers(supabase: any, familiaId: string, memberIds: string[]) {
+async function processMembers(supabase: any, familiaId: string, memberIds: string[], jefeId?: string) {
     for (const memberId of memberIds) {
-        const { error: errorUpdate } = await supabase.from('comuneros').update({
-            familia_id: familiaId
-        }).eq('id', memberId);
-        
+        const updatePayload: any = { familia_id: familiaId };
+        if (memberId === jefeId) {
+            updatePayload.parentezco_cabeza = 'Cabeza de familia';
+        }
+
+        const { error: errorUpdate } = await supabase.from('comuneros').update(updatePayload).eq('id', memberId);
+
         if (errorUpdate) {
             logDebug(`Error updating member ${memberId}: ${errorUpdate.message}`);
         } else {

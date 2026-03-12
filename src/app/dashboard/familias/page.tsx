@@ -1,162 +1,143 @@
 import React from 'react';
-import Link from 'next/link';
+import { Users, Search, UserPlus, MapPin, ChevronRight, User, Hash } from 'lucide-react';
 import { createClient } from '@/utils/supabase/server';
-import {
-    Search,
-    MapPin,
-    Users,
-    CheckCircle,
-    Filter,
-    ChevronDown,
-    ChevronLeft,
-    ChevronRight,
-    UserPlus,
-    Inbox
-} from 'lucide-react';
+import Link from 'next/link';
 
-export default async function FamiliasDirectoryPage() {
+export default async function FamiliasPage() {
     const supabase = await createClient();
 
-    // Fetch familias along with the count of comuneros belonging to each familia
+    // Fetch familias along with the count of comuneros and the head of family info
     const { data: familiasData, error } = await supabase
         .from('familias')
-        .select('*, comuneros(id)')
+        .select(`
+            *,
+            comuneros(id, primer_nombre, primer_apellido, parentezco_cabeza)
+        `)
         .order('created_at', { ascending: false });
 
-    // Format the fetched data for the table
-    const familias = familiasData?.map((f) => {
-        // Generate initials
-        const nameParts = (f.nombre_cabeza_familia || 'Sin Nombre').trim().split(' ');
-        let initials = nameParts[0]?.[0] || '';
-        if (nameParts.length > 1) {
-            initials += nameParts[nameParts.length - 1][0];
-        }
+    const familias = (familiasData || []).map((f: any) => {
+        const jefe = f.comuneros?.find((c: any) => 
+            c.parentezco_cabeza === 'Cabeza de familia' || 
+            c.parentezco_cabeza === 'Jefe de Hogar' ||
+            c.parentezco_cabeza === 'Padre' ||
+            c.parentezco_cabeza === 'Madre'
+        ) || f.comuneros?.[0];
 
         return {
             id: f.id,
-            code: f.codigo_familia || 'WK-0000',
-            rep: f.nombre_cabeza_familia || 'Sin Representante',
-            initials: initials.toUpperCase(),
-            members: f.comuneros ? f.comuneros.length : 0,
-            location: f.vereda_comunidad || 'No Asignada',
-            status: "Registrado", // You can update this based on logic later
-            statusColor: "emerald"
+            codigoFamilia: f.codigo_familia || `FAM-${f.id?.slice(0, 6)}`,
+            nombreFamilia: f.nombre_familia || 'Sin nombre',
+            vereda: f.vereda_comunidad || 'Sin ubicación',
+            numIntegrantes: Array.isArray(f.comuneros) ? f.comuneros.length : 0,
+            representante: jefe
+                ? `${jefe.primer_nombre || ''} ${jefe.primer_apellido || ''}`.trim() || 'Sin representante'
+                : 'Sin representante'
         };
-    }) || [];
-
+    });
 
     return (
-        <div className="flex-1 flex flex-col overflow-hidden bg-background">
+        <div className="flex-1 flex flex-col min-h-0 bg-background">
             {/* Header */}
-            <header className="h-auto px-6 lg:px-8 py-10 flex flex-col gap-6">
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Directorio de Familias del Territorio</h1>
-                        <p className="text-muted-foreground mt-1">Gestión y censo de hogares en el resguardo indígena Wala Kiwe.</p>
+            <header className="h-16 shrink-0 border-b border-border flex items-center justify-between px-6 lg:px-8 bg-card/80 backdrop-blur-sm sticky top-0 z-20">
+                <div className="flex items-center gap-3">
+                    <div className="bg-primary/10 p-2 rounded-xl border border-primary/20">
+                        <Users className="w-5 h-5 text-primary" />
                     </div>
-                    <Link href="/dashboard/familias/nuevo" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2.5 px-5 rounded-lg flex items-center gap-2 transition-all shadow-lg shadow-primary/20 shrink-0">
-                        <UserPlus className="w-5 h-5" />
-                        <span>Nueva Familia</span>
-                    </Link>
+                    <div>
+                        <h2 className="text-lg font-bold text-foreground leading-tight">Directorio de Familias</h2>
+                        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Núcleos familiares del resguardo</p>
+                    </div>
                 </div>
 
-                {/* Filters & Search */}
-                <div className="flex flex-col lg:flex-row gap-4">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
-                        <input
-                            className="w-full pl-11 pr-4 py-2.5 bg-card border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm transition-all text-foreground outline-none"
-                            placeholder="Buscar por representante o ID familiar..."
-                            type="text"
-                        />
-                    </div>
-                    <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                        <button className="flex items-center gap-2 px-4 py-2.5 bg-card border border-border rounded-lg text-sm font-medium text-muted-foreground hover:border-primary hover:text-foreground transition-all whitespace-nowrap">
-                            <MapPin className="w-4 h-4" />
-                            Vereda: Todas
-                            <ChevronDown className="w-4 h-4 opacity-70" />
-                        </button>
-                        <button className="flex items-center gap-2 px-4 py-2.5 bg-card border border-border rounded-lg text-sm font-medium text-muted-foreground hover:border-primary hover:text-foreground transition-all whitespace-nowrap">
-                            <Users className="w-4 h-4" />
-                            Integrantes
-                            <ChevronDown className="w-4 h-4 opacity-70" />
-                        </button>
-                        <button className="flex items-center gap-2 px-4 py-2.5 bg-card border border-border rounded-lg text-sm font-medium text-muted-foreground hover:border-primary hover:text-foreground transition-all whitespace-nowrap">
-                            <CheckCircle className="w-4 h-4" />
-                            Estado: Todos
-                            <ChevronDown className="w-4 h-4 opacity-70" />
-                        </button>
-                        <div className="hidden lg:block w-[1px] h-8 bg-border mx-2"></div>
-                        <button className="p-2.5 bg-card border border-border rounded-lg text-muted-foreground hover:text-primary hover:border-primary transition-colors shrink-0">
-                            <Filter className="w-5 h-5" />
-                        </button>
-                    </div>
+                <div className="flex items-center gap-3">
+                    <Link href="/dashboard/familias/nuevo" className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-sm hover:shadow-md active:scale-95">
+                        <UserPlus className="w-4 h-4" />
+                        <span className="hidden sm:inline">Nueva Familia</span>
+                    </Link>
                 </div>
             </header>
 
-            {/* Content Area */}
-            <div className="flex-1 overflow-auto px-6 lg:px-8 pb-8">
-                {familias.length === 0 ? (
-                    /* Empty State */
-                    <div className="flex flex-col items-center justify-center p-12 bg-card border border-border rounded-2xl shadow-sm h-full max-h-[400px]">
-                        <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-                            <Inbox className="w-10 h-10 text-primary opacity-80" />
+            {/* Content */}
+            <main className="flex-1 overflow-y-auto p-6 lg:p-8 space-y-6 custom-scrollbar">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <h3 className="text-lg font-bold text-foreground">Familias Registradas</h3>
+                        <span className="bg-primary/10 text-primary text-[10px] px-3 py-1 rounded-full border border-primary/20 font-bold uppercase tracking-wider">
+                            {familias.length} familias
+                        </span>
+                    </div>
+                </div>
+
+                {error && (
+                    <div className="bg-destructive/10 text-destructive border border-destructive/30 rounded-xl p-4 text-sm">
+                        Error al cargar las familias: {error.message}
+                    </div>
+                )}
+
+                {familias.length === 0 && !error ? (
+                    <div className="text-center py-20">
+                        <div className="w-16 h-16 mx-auto bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 mb-4">
+                            <Users className="w-8 h-8 text-primary/40" />
                         </div>
-                        <h2 className="text-xl font-bold text-foreground mb-2">No se encontraron familias</h2>
-                        <p className="text-muted-foreground text-center max-w-md mb-8">
-                            Aún no hay familias registradas en el territorio o los filtros actuales no arrojaron resultados. Añade la primera familia para comenzar a gestionar sus datos.
+                        <h3 className="text-lg font-bold text-foreground mb-2">Sin familias registradas</h3>
+                        <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+                            Aún no se han creado núcleos familiares. Comience agregando la primera familia del territorio.
                         </p>
-                        <Link href="/dashboard/familias/nuevo" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2.5 px-6 rounded-lg transition-all shadow-md flex items-center gap-2">
-                            <UserPlus className="w-5 h-5" />
+                        <Link href="/dashboard/familias/nuevo" className="bg-primary text-primary-foreground px-6 py-3 rounded-xl font-bold text-sm inline-flex items-center gap-2 hover:bg-primary/90 transition-all shadow-sm">
+                            <UserPlus className="w-4 h-4" />
                             Registrar Primera Familia
                         </Link>
                     </div>
                 ) : (
-                    /* Table Section */
-                    <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+                    <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse whitespace-nowrap min-w-[800px]">
-                                <thead className="bg-secondary/50 border-b border-border">
-                                    <tr>
-                                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Representante (Jefe de Hogar)</th>
-                                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">ID Familiar</th>
-                                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Integrantes</th>
-                                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Vereda / Sector</th>
-                                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider">Estado de Predio</th>
-                                        <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">Acciones</th>
+                            <table className="w-full text-left border-collapse min-w-[700px]">
+                                <thead>
+                                    <tr className="border-b border-border bg-secondary/50">
+                                        <th className="px-5 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">Familia</th>
+                                        <th className="px-5 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">Representante</th>
+                                        <th className="px-5 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">Ubicación</th>
+                                        <th className="px-5 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground text-center">Integrantes</th>
+                                        <th className="px-5 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground text-right">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border">
-                                    {familias.map((familia, idx) => (
-                                        <tr key={idx} className="hover:bg-secondary/30 transition-colors">
-                                            <td className="px-6 py-5">
+                                    {familias.map((familia: any) => (
+                                        <tr key={familia.id} className="hover:bg-primary/[0.03] transition-colors group">
+                                            <td className="px-5 py-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
-                                                        {familia.initials}
+                                                    <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/15 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+                                                        <Users className="w-4 h-4 text-primary" />
                                                     </div>
-                                                    <span className="text-sm font-semibold text-foreground">{familia.rep}</span>
+                                                    <div>
+                                                        <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">{familia.nombreFamilia}</p>
+                                                        <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                                                            <Hash className="w-2.5 h-2.5" />
+                                                            <span>{familia.codigoFamilia}</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-5">
-                                                <code className="text-xs bg-secondary px-2 py-1 rounded text-primary font-mono font-medium">
-                                                    {familia.code}
-                                                </code>
+                                            <td className="px-5 py-4">
+                                                <div className="flex items-center gap-2">
+                                                    <User className="w-3.5 h-3.5 text-muted-foreground" />
+                                                    <span className="text-sm text-foreground/80">{familia.representante}</span>
+                                                </div>
                                             </td>
-                                            <td className="px-6 py-5 text-sm text-muted-foreground">{familia.members} miembros</td>
-                                            <td className="px-6 py-5 text-sm text-muted-foreground">{familia.location}</td>
-                                            <td className="px-6 py-5">
-                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-                                                    familia.statusColor === 'emerald' 
-                                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                                                        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                                                }`}>
-                                                    <span className={`w-1.5 h-1.5 rounded-full ${familia.statusColor === 'emerald' ? 'bg-green-500' : 'bg-amber-500'}`}></span>
-                                                    {familia.status}
+                                            <td className="px-5 py-4">
+                                                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                                    <MapPin className="w-3 h-3 shrink-0" />
+                                                    <span className="truncate max-w-[150px]">{familia.vereda}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-5 py-4 text-center">
+                                                <span className={`text-xs font-bold px-2.5 py-1 rounded-md ${familia.numIntegrantes > 0 ? 'bg-accent/15 text-accent' : 'bg-secondary text-muted-foreground'}`}>
+                                                    {familia.numIntegrantes}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-5 text-right">
-                                                <Link href={`/dashboard/familias/${familia.id}`} className="text-primary hover:underline text-sm font-bold">
-                                                    Abrir Ficha
+                                            <td className="px-5 py-4 text-right">
+                                                <Link href={`/dashboard/familias/${familia.id}`} className="text-primary text-xs font-bold hover:underline flex items-center gap-1 justify-end">
+                                                    Ver Ficha <ChevronRight className="w-3 h-3" />
                                                 </Link>
                                             </td>
                                         </tr>
@@ -164,25 +145,9 @@ export default async function FamiliasDirectoryPage() {
                                 </tbody>
                             </table>
                         </div>
-                        {/* Pagination */}
-                        <div className="px-6 py-4 bg-secondary/30 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-border">
-                            <span className="text-xs text-muted-foreground font-medium">Mostrando {familias.length} de 128 familias</span>
-                            <div className="flex items-center gap-2">
-                                <button className="p-1 rounded hover:bg-secondary text-muted-foreground disabled:opacity-30 transition-colors" disabled>
-                                    <ChevronLeft className="w-5 h-5" />
-                                </button>
-                                <button className="px-2.5 py-1 text-xs font-bold rounded bg-primary text-primary-foreground shadow-sm">1</button>
-                                <button className="px-2.5 py-1 text-xs font-medium rounded hover:bg-secondary text-muted-foreground transition-colors">2</button>
-                                <button className="px-2.5 py-1 text-xs font-medium rounded hover:bg-secondary text-muted-foreground transition-colors">3</button>
-                                <span className="text-muted-foreground px-1">...</span>
-                                <button className="p-1 rounded hover:bg-secondary text-muted-foreground transition-colors">
-                                    <ChevronRight className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 )}
-            </div>
+            </main>
         </div>
     );
 }

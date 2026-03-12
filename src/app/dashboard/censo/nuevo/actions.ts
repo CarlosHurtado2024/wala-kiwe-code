@@ -102,10 +102,6 @@ export async function registrarComunero(formData: FormData) {
             discapacidades: rawData.discapacidades,
             foto_url: fotoUrl,
             familia_id: null,
-            // Poblamos columnas legadas para compatibilidad con vistas existentes
-            nombres: `${rawData.primerNombre} ${rawData.segundoNombre || ""}`.trim(),
-            apellidos: `${rawData.primerApellido} ${rawData.segundoApellido}`.trim(),
-            documento_identidad: rawData.numeroDocumento,
             // 4. Generate and store embedding
             embedding: await generateEmbedding(await prepareComuneroText({
                 primer_nombre: rawData.primerNombre,

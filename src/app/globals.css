@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "tailwindcss" source("../../src");
 
 @theme {
   --color-border: hsl(var(--border));
@@ -41,72 +41,71 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* Pure white background */
-    --foreground: 220 15% 15%; /* Charcoal/Slate text for readability */
+    --background: 210 20% 98%;
+    --foreground: 220 20% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 15% 15%;
+    --card-foreground: 220 20% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 15% 15%;
+    --popover-foreground: 220 20% 12%;
 
-    /* Primary: Soft pastel blue/indigo */
-    --primary: 220 70% 65%;
+    /* Primary: Rich Indigo */
+    --primary: 230 65% 55%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Very light gray/blue for backgrounds of secondary areas */
-    --secondary: 220 20% 97%;
+    /* Secondary: Cool gray background */
+    --secondary: 220 20% 96%;
     --secondary-foreground: 220 15% 25%;
 
-    /* Muted: Soft gray for subtle elements */
-    --muted: 220 15% 95%;
-    --muted-foreground: 220 10% 45%;
+    /* Muted: Subtle elements */
+    --muted: 220 15% 93%;
+    --muted-foreground: 220 10% 46%;
 
-    /* Accent: Pastel Mint Green */
-    --accent: 150 60% 70%;
-    --accent-foreground: 150 40% 20%;
+    /* Accent: Vibrant Teal */
+    --accent: 160 55% 48%;
+    --accent-foreground: 160 50% 14%;
 
-    /* Destructive: Soft pastel red/pink */
-    --destructive: 350 70% 70%;
+    /* Destructive: Warm red */
+    --destructive: 0 72% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Subtle borders */
-    --border: 220 20% 90%;
-    --input: 220 20% 90%;
-    --ring: 220 70% 65%;
+    /* Borders */
+    --border: 220 15% 90%;
+    --input: 220 15% 88%;
+    --ring: 230 65% 55%;
 
-    --radius: 1.5rem; /* Larger, softer radius for a modern feel */
+    --radius: 0.75rem;
   }
 
-  /* We keep dark mode as fallback, but the goal is the light minimalist theme */
   .dark {
-    --background: 220 15% 10%;
+    --background: 224 20% 7%;
     --foreground: 220 20% 95%;
 
-    --card: 220 15% 13%;
+    --card: 224 18% 10%;
     --card-foreground: 220 20% 95%;
 
-    --popover: 220 15% 13%;
+    --popover: 224 18% 10%;
     --popover-foreground: 220 20% 95%;
 
-    --primary: 220 70% 65%;
-    --primary-foreground: 220 15% 10%;
+    --primary: 230 65% 62%;
+    --primary-foreground: 224 20% 7%;
 
-    --secondary: 220 15% 20%;
+    --secondary: 224 15% 16%;
     --secondary-foreground: 220 20% 95%;
 
-    --muted: 220 15% 20%;
-    --muted-foreground: 220 10% 70%;
+    --muted: 224 12% 18%;
+    --muted-foreground: 220 10% 62%;
 
-    --accent: 150 60% 70%;
-    --accent-foreground: 220 15% 10%;
+    --accent: 160 55% 48%;
+    --accent-foreground: 224 20% 7%;
 
-    --destructive: 350 70% 70%;
+    --destructive: 0 72% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 20%;
-    --input: 220 15% 20%;
-    --ring: 220 70% 65%;
+    --border: 224 12% 18%;
+    --input: 224 12% 18%;
+    --ring: 230 65% 62%;
   }
 }
 
@@ -117,11 +116,151 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
-    background-color: hsl(var(--primary) / 0.2);
+    background-color: hsl(var(--primary) / 0.15);
     color: inherit;
   }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 100px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.4);
+}
+
+/* Global scrollbar for body */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 100px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.3);
+}
+
+/* Animations */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-fade-in { animation: fade-in 0.3s ease-out; }
+.animate-slide-up { animation: slide-up 0.4s ease-out; }
+.animate-slide-down { animation: slide-down 0.3s ease-out; }
+.animate-scale-in { animation: scale-in 0.3s ease-out; }
+.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 25%, hsl(var(--primary) / 0.08) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Toast Container */
+.toast-container {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  animation: slide-down 0.3s ease-out;
+  padding: 0.875rem 1.25rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 4px 10px -5px rgba(0,0,0,0.05);
+  border: 1px solid;
+}
+
+.toast-success {
+  background: hsl(160, 55%, 95%);
+  color: hsl(160, 55%, 25%);
+  border-color: hsl(160, 55%, 80%);
+}
+
+.toast-error {
+  background: hsl(0, 72%, 95%);
+  color: hsl(0, 72%, 35%);
+  border-color: hsl(0, 72%, 80%);
+}
+
+/* Smooth transitions for interactive elements */
+.transition-smooth {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prose overrides for AI chat */
+.prose-chat table {
+  font-size: 0.8125rem;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.prose-chat th,
+.prose-chat td {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid hsl(var(--border));
+  text-align: left;
+}
+
+.prose-chat th {
+  background: hsl(var(--secondary));
+  font-weight: 700;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
